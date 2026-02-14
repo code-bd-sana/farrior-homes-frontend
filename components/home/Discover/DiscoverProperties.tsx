@@ -1,8 +1,9 @@
-import Title from "../shared/Title/Title";
+import Title from "../../shared/Title/Title";
+import Discover from "./Discover";
 
 export default function DiscoverProperties() {
   return (
-    <div className='text-(--primary-text-color) '>
+    <div className='text-(--primary-text-color) flex flex-col items-center justify-center text-center mt-12'>
       <Title
         title={"Discover Your Dream Home"}
         subtitle={
@@ -10,9 +11,10 @@ export default function DiscoverProperties() {
         }
         titleClass={"max-w-210 text-4xl md:text-[48px] font-bold"}
         subtitleClass={
-          "text-lg font-light text-xl md:text-[24px] mb-10 md:mb-12 max-w-3xl mt-3.25"
+          "text-lg max-w-150 text-xl md:text-[24px] mb-6 md:mb-7 max-w-3xl mt-3.25"
         }
       />
+      <Discover />
     </div>
   );
 }
