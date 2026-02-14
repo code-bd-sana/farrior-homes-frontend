@@ -1,8 +1,12 @@
+import DiscoverProperties from "@/components/home/DiscoverProperties";
+import HomeBanner from "@/components/home/HomeBanner";
+
 export default function HomePage() {
   return (
     <div>
       <div>
-        <p className='text-lg'>Farrior Homes</p>
+        <HomeBanner />
+        <DiscoverProperties />
       </div>
     </div>
   );
