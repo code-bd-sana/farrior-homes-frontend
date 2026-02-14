@@ -50,7 +50,7 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* DESKTOP NAV - centered-ish with flex-grow */}
+          {/* DESKTOP NAV */}
           <nav className='hidden lg:flex items-center gap-6 flex-1 justify-start ml-25'>
             {navItems.map((item) => {
               const isActive = pathname === item.href;

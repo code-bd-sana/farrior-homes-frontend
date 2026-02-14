@@ -72,8 +72,8 @@ const Discover = () => {
               ]}
               // date={p.date}
               // dateIcon={Calendar}
+              id={p.id}
               price={p.price}
-              onPrimaryAction={() => console.log("view", p.id)}
               type={"property"}
               primaryActionLabel='View Details'
             />

@@ -1,5 +1,8 @@
+"use client";
+
 import { Calendar } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React, { ReactNode } from "react";
 
 type MetaItem = {
@@ -13,6 +16,7 @@ type BaseProps = {
   badge?: string;
   title?: string;
   subtitle?: string;
+  id?: string | number;
   onPrimaryAction?: () => void;
   primaryActionLabel?: string;
   children?: ReactNode; // for custom content
@@ -38,7 +42,9 @@ export type NewsCardProps = BaseProps & {
 type CardProps = PropertyCardProps | NewsCardProps;
 
 const Card: React.FC<CardProps> = (props) => {
+  const router = useRouter();
   const {
+    id,
     imageUrl,
     badge,
     title,
@@ -55,6 +61,20 @@ const Card: React.FC<CardProps> = (props) => {
   const price = !isNews ? (props as PropertyCardProps).price : undefined;
   const date = isNews ? (props as NewsCardProps).date : undefined;
   const dateIcon = isNews ? (props as NewsCardProps).dateIcon : undefined;
+
+  // Add this handler function
+  const handlePrimaryAction = () => {
+    if (onPrimaryAction) {
+      onPrimaryAction(); // Call custom action if provided
+    } else if (id) {
+      // Navigate based on type
+      if (type === "property") {
+        router.push(`/properties/${id}`);
+      } else if (type === "news") {
+        router.push(`/news/${id}`);
+      }
+    }
+  };
   return (
     <div
       className={`rounded-lg overflow-hidden shadow-lg bg-white ${className}`}>
@@ -131,8 +151,10 @@ const Card: React.FC<CardProps> = (props) => {
               )}
             </div>
 
-            {onPrimaryAction && (
-              <button onClick={onPrimaryAction} className=' text-sm underline'>
+            {(onPrimaryAction || id) && (
+              <button
+                onClick={handlePrimaryAction} // Use the new handler
+                className='text-sm underline cursor-pointer'>
                 {primaryActionLabel}
               </button>
             )}
