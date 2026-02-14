@@ -153,7 +153,7 @@ const Card: React.FC<CardProps> = (props) => {
 
             {(onPrimaryAction || id) && (
               <button
-                onClick={handlePrimaryAction} // Use the new handler
+                onClick={handlePrimaryAction}
                 className='text-sm underline cursor-pointer'>
                 {primaryActionLabel}
               </button>

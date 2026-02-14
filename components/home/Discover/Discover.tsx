@@ -60,6 +60,7 @@ const Discover = () => {
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6'>
           {sampleProperties.map((p) => (
             <Card
+              id={p.id}
               key={p.id}
               imageUrl={p.imageUrl}
               badge='For Sale'
@@ -72,7 +73,6 @@ const Discover = () => {
               ]}
               // date={p.date}
               // dateIcon={Calendar}
-              id={p.id}
               price={p.price}
               type={"property"}
               primaryActionLabel='View Details'
