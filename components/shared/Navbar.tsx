@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
@@ -17,11 +17,24 @@ const navItems = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <header className='w-full bg-white border-b border-gray-200 shadow-sm'>
-      <div className='md:mx-12.5 px-6 lg:px-8 '>
+    <header
+      className={`w-full transition-colors duration-200 ${
+        scrolled || open
+          ? "bg-white/80 border-b border-gray-200 shadow-sm backdrop-blur-sm"
+          : "bg-transparent border-b border-transparent"
+      }`}>
+      <div className='md:mx-12.5 px-6 lg:px-8 border-b border-gray-200'>
         <div className='flex items-center justify-between h-20'>
           {/* LOGO + tagline */}
           <Link href='/' className='flex flex-col items-start'>

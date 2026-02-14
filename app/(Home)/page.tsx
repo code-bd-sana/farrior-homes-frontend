@@ -1,4 +1,4 @@
-import DiscoverProperties from "@/components/home/DiscoverProperties";
+import DiscoverProperties from "@/components/home/Discover/DiscoverProperties";
 import HomeBanner from "@/components/home/HomeBanner";
 
 export default function HomePage() {
