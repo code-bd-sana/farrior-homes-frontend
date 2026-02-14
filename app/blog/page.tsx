@@ -1,4 +1,5 @@
 import BlogCard from "@/components/blog/BlogCard";
+import PageTitle from "@/components/shared/pagetitle/PageTitle";
 import { Iblog } from "@/types/blog";
 
 const blogs: Iblog[] = [
@@ -42,11 +43,17 @@ const blogs: Iblog[] = [
 
 const page = () => {
   return (
-    <div className='max-w-[1440px] mx-auto px-8 mt-8'>
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-4 justify-between lg:grid-cols-4'>
-        {blogs.map((blog, idx) => (
-          <BlogCard blog={blog} key={idx + 1} />
-        ))}
+    <div>
+      <PageTitle
+        title='Blog and Articles'
+        subtitle='Insights and tips from our experts'
+      />
+      <div className='max-w-[1440px] mx-auto px-8 mt-8'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 justify-between lg:grid-cols-4'>
+          {blogs.map((blog, idx) => (
+            <BlogCard blog={blog} key={idx + 1} />
+          ))}
+        </div>
       </div>
     </div>
   );
