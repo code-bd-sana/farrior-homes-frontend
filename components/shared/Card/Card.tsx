@@ -32,7 +32,7 @@ export type PropertyCardProps = BaseProps & {
 };
 
 export type NewsCardProps = BaseProps & {
-  type: "news";
+  type: "blog";
   date: string;
   dateIcon?: React.ElementType;
   meta?: undefined;
@@ -56,7 +56,7 @@ const Card: React.FC<CardProps> = (props) => {
     className = "",
   } = props;
 
-  const isNews = props.type === "news";
+  const isNews = props.type === "blog";
   const meta = !isNews ? ((props as PropertyCardProps).meta ?? []) : [];
   const price = !isNews ? (props as PropertyCardProps).price : undefined;
   const date = isNews ? (props as NewsCardProps).date : undefined;
@@ -70,8 +70,8 @@ const Card: React.FC<CardProps> = (props) => {
       // Navigate based on type
       if (type === "property") {
         router.push(`/properties/${id}`);
-      } else if (type === "news") {
-        router.push(`/news/${id}`);
+      } else if (type === "blog") {
+        router.push(`/blog/${id}`);
       }
     }
   };
@@ -99,7 +99,7 @@ const Card: React.FC<CardProps> = (props) => {
         {title && (
           <h2
             className={
-              type === "news"
+              type === "blog"
                 ? "text-2xl font-medium mb-2"
                 : "text-2xl font-bold mb-2"
             }>
@@ -109,7 +109,7 @@ const Card: React.FC<CardProps> = (props) => {
         {subtitle && (
           <div
             className={
-              type === "news" ? "text-gray-500 mb-4" : "text-[12px] mb-4"
+              type === "blog" ? "text-gray-500 mb-4" : "text-[12px] mb-4"
             }>
             {subtitle}
           </div>

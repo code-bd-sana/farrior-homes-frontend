@@ -3,40 +3,40 @@ import { Iblog } from "@/types/blog";
 
 const blogs: Iblog[] = [
   {
-    _id: 1,
+    id: "1",
     title: "10 Tips for First-Time Home Buyers",
     description:
       "Essential advice to help you navigate your first home purchase with confidence.",
     date: "30 January, 2026",
     category: "Selling Tips",
-    image: "@/public/blog.jpg",
+    image: "/blog.jpg",
   },
   {
-    _id: 2,
+    id: "2",
     title: "10 Tips for First-Time Home Buyers",
     description:
       "Essential advice to help you navigate your first home purchase with confidence.",
     date: "30 January, 2026",
     category: "Selling Tips",
-    image: "@/public/blog.jpg",
+    image: "/blog.jpg",
   },
   {
-    _id: 3,
+    id: "3",
     title: "10 Tips for First-Time Home Buyers",
     description:
       "Essential advice to help you navigate your first home purchase with confidence.",
     date: "30 January, 2026",
     category: "Selling Tips",
-    image: "@/public/blog.jpg",
+    image: "/blog.jpg",
   },
   {
-    _id: 4,
+    id: "4",
     title: "10 Tips for First-Time Home Buyers",
     description:
       "Essential advice to help you navigate your first home purchase with confidence.",
     date: "30 January, 2026",
     category: "Selling Tips",
-    image: "@/public/blog.jpg",
+    image: "/blog.jpg",
   },
 ];
 

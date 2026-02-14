@@ -1,5 +1,4 @@
 "use client";
-import image from "@/public/blog.jpg";
 import { Iblog } from "@/types/blog";
 import React from "react";
 import Card from "../shared/Card/Card";
@@ -9,12 +8,12 @@ interface BlogCardProps {
   variant?: "vertical" | "horizontal";
 }
 
-const handleButton = async () => {
-  console.log("Console log");
-};
-
 const BlogCard: React.FC<BlogCardProps> = ({ blog, variant = "vertical" }) => {
   console.log(blog, "blog is console log");
+
+  const handleBlog = async () => {
+    console.log("console lg");
+  };
 
   // const cardData = {
   //   imageUrl: blog.image,
@@ -28,15 +27,15 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, variant = "vertical" }) => {
   return (
     <div className=' '>
       <Card
-        key={blog._id}
-        imageUrl={image}
+        key={blog.id}
+        id={blog.id}
+        imageUrl={blog.image}
         badge={blog.category}
         title={blog.title}
         subtitle={blog.description}
-        type={"news"}
+        type={"blog"}
         date={blog.date}
         primaryActionLabel='View Details'
-        onPrimaryAction={handleButton}
       />
     </div>
   );
