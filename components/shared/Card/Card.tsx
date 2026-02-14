@@ -1,5 +1,8 @@
+"use client";
+
 import { Calendar } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React, { ReactNode } from "react";
 
 type MetaItem = {
@@ -13,6 +16,7 @@ type BaseProps = {
   badge?: string;
   title?: string;
   subtitle?: string;
+  id?: string | number;
   onPrimaryAction?: () => void;
   primaryActionLabel?: string;
   children?: ReactNode; // for custom content
@@ -28,7 +32,7 @@ export type PropertyCardProps = BaseProps & {
 };
 
 export type NewsCardProps = BaseProps & {
-  type: "news";
+  type: "blog";
   date: string;
   dateIcon?: React.ElementType;
   meta?: undefined;
@@ -38,7 +42,9 @@ export type NewsCardProps = BaseProps & {
 type CardProps = PropertyCardProps | NewsCardProps;
 
 const Card: React.FC<CardProps> = (props) => {
+  const router = useRouter();
   const {
+    id,
     imageUrl,
     badge,
     title,
@@ -50,11 +56,25 @@ const Card: React.FC<CardProps> = (props) => {
     className = "",
   } = props;
 
-  const isNews = props.type === "news";
+  const isNews = props.type === "blog";
   const meta = !isNews ? ((props as PropertyCardProps).meta ?? []) : [];
   const price = !isNews ? (props as PropertyCardProps).price : undefined;
   const date = isNews ? (props as NewsCardProps).date : undefined;
   const dateIcon = isNews ? (props as NewsCardProps).dateIcon : undefined;
+
+  // Add this handler function
+  const handlePrimaryAction = () => {
+    if (onPrimaryAction) {
+      onPrimaryAction(); // Call custom action if provided
+    } else if (id) {
+      // Navigate based on type
+      if (type === "property") {
+        router.push(`/properties/${id}`);
+      } else if (type === "blog") {
+        router.push(`/blog/${id}`);
+      }
+    }
+  };
   return (
     <div
       className={`rounded-lg overflow-hidden shadow-lg bg-white ${className}`}>
@@ -79,7 +99,7 @@ const Card: React.FC<CardProps> = (props) => {
         {title && (
           <h2
             className={
-              type === "news"
+              type === "blog"
                 ? "text-2xl font-medium mb-2"
                 : "text-2xl font-bold mb-2"
             }>
@@ -89,7 +109,7 @@ const Card: React.FC<CardProps> = (props) => {
         {subtitle && (
           <div
             className={
-              type === "news" ? "text-gray-500 mb-4" : "text-[12px] mb-4"
+              type === "blog" ? "text-gray-500 mb-4" : "text-[12px] mb-4"
             }>
             {subtitle}
           </div>
@@ -131,8 +151,10 @@ const Card: React.FC<CardProps> = (props) => {
               )}
             </div>
 
-            {onPrimaryAction && (
-              <button onClick={onPrimaryAction} className=' text-sm underline'>
+            {(onPrimaryAction || id) && (
+              <button
+                onClick={handlePrimaryAction}
+                className='text-sm underline cursor-pointer'>
                 {primaryActionLabel}
               </button>
             )}
