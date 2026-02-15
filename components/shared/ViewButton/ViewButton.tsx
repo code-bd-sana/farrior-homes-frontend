@@ -9,8 +9,8 @@ type ViewButtonProps = {
 };
 
 export default function ViewButton({
-  label = "View Properties",
-  href = "/properties",
+  label = "",
+  href = "",
   className = "",
 }: ViewButtonProps) {
   const router = useRouter();

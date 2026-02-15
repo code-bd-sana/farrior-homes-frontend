@@ -51,7 +51,7 @@ const Card: React.FC<CardProps> = (props) => {
     subtitle,
     type,
     onPrimaryAction,
-    primaryActionLabel = "View Details",
+    primaryActionLabel = "",
     children,
     className = "",
   } = props;

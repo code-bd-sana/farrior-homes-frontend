@@ -10,8 +10,6 @@ export default function HomeLayout({ children }: { children: ReactNode }) {
 
       {/* Main content */}
       <main>{children}</main>
-
-      {/* <Footer /> */}
     </>
   );
 }
