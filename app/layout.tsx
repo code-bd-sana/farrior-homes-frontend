@@ -20,7 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <body className={jost.className}>{children}</body>
+      <body className={`${jost.className} min-h-screen flex flex-col`}>
+        {children}
+      </body>
     </html>
   );
 }
