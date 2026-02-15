@@ -43,7 +43,7 @@ export default function Footer() {
   ];
   return (
     <div>
-      <div className='bg-[#304C3E] text-white py-20'>
+      <div className='bg-[#304C3E] text-white py-7 md:py-20'>
         <div className='md:mx-12.5 px-6 lg:px-8'>
           <div className='grid grid-cols-1 md:grid-cols-4 gap-8'>
             <div>
@@ -131,8 +131,8 @@ export default function Footer() {
       </div>
 
       {/* Footer Bottom */}
-      <div className='flex justify-between items-center md:mx-12.5 text-[#304C3E]'>
-        <div className='text-center text-sm p-5'>
+      <div className='flex flex-col md:flex-row gap-2 justify-between items-center md:mx-12.5 text-[#304C3E] p-5'>
+        <div className='text-center text-sm '>
           Copyright &copy; {new Date().getFullYear()} 2026 Farrior Homes INC.
           All Rights Reserved.
         </div>
