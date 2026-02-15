@@ -25,7 +25,7 @@ export default function ClientSatisfaction() {
       <div className='text-white flex flex-col items-center justify-center text-center px-4 md:px-8'>
         <Title
           title='Advocating for Your Ideal Living in the South Suburbs'
-          titleClass='max-w-[800px] text-3xl sm:text-4xl md:text-5xl lg:text-[52px] font-bold leading-tight mb-12 md:mb-16'
+          titleClass='max-w-[750px] text-3xl sm:text-4xl md:text-[48px] font-bold leading-tight mb-12 md:mb-16'
         />
       </div>
       <div className='max-w-350 mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16 lg:gap-20 px-6 md:px-12 lg:px-20'>
@@ -40,8 +40,8 @@ export default function ClientSatisfaction() {
             <Title
               title={item.title}
               subtitle={item.description}
-              titleClass='text-white text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight '
-              subtitleClass='text-white text-lg md:text-xl lg:text-2xl font-light max-w-[280px] md:max-w-[250px] leading-relaxed'
+              titleClass='text-white text-5xl md:text-[64px] font-bold tracking-tight '
+              subtitleClass='text-white text-lg md:text-[24px] lg:text-2xl font-light max-w-[280px] md:max-w-[250px] leading-relaxed'
             />
           </div>
         ))}

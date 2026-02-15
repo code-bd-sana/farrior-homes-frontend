@@ -1,11 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import Title from "../../shared/Title/Title";
 import Discover from "./Discover";
+import ViewButton from "../../shared/ViewButton/ViewButton";
 
 export default function DiscoverProperties() {
-  const router = useRouter();
   return (
     <div className='text-(--primary-text-color) flex flex-col items-center justify-center text-center my-12'>
       <Title
@@ -20,13 +19,7 @@ export default function DiscoverProperties() {
       />
       <Discover />
 
-      {/* View Properties button, redirect to properties page */}
-      <button
-        type='button'
-        onClick={() => router.push("/properties")}
-        className='mt-3 px-6 py-3 bg-(--primary) text-xl text-white rounded-lg hover:bg-(--primary-hover) transition-colors duration-300 cursor-pointer'>
-        View Properties
-      </button>
+      <ViewButton label='View Properties' href='/properties' />
     </div>
   );
 }
