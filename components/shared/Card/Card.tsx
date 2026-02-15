@@ -77,7 +77,7 @@ const Card: React.FC<CardProps> = (props) => {
   };
   return (
     <div
-      className={`rounded-lg overflow-hidden shadow-lg bg-white ${className}`}>
+      className={`rounded-lg overflow-hidden shadow-lg bg-white flex flex-col h-full ${className}`}>
       {imageUrl && (
         <div className='relative h-64 w-full'>
           <Image
@@ -94,8 +94,7 @@ const Card: React.FC<CardProps> = (props) => {
         </div>
       )}
 
-      <div className='p-6 text-(--primary-text-color) text-start'>
-        {/* {title && <h2 className='text-2xl font-bold mb-2 '>{title}</h2>} */}
+      <div className='p-6 text-(--primary-text-color) text-start flex flex-1 flex-col justify-between'>
         {title && (
           <h2
             className={
