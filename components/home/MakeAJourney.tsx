@@ -28,7 +28,7 @@ export default function MakeAJourney() {
         <div className='hidden md:flex md:col-span-8'>
           <div className='relative w-full h-screen md:h-full'>
             <Image
-              src='/hero.jpg'
+              src='/Hero.jpg'
               alt='Make a Journey'
               fill
               sizes='(max-width: 768px) 100vw, 50vw'
