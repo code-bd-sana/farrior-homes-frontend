@@ -9,7 +9,7 @@ interface BlogCardProps {
 }
 
 const BlogCard: React.FC<BlogCardProps> = ({ blog, variant = "vertical" }) => {
-  console.log(blog, "blog is console log");
+  // console.log(blog, "blog is console log");
 
   const handleBlog = async () => {
     console.log("console lg");
