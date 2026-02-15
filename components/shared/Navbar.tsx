@@ -29,12 +29,12 @@ export default function Navbar() {
 
   return (
     <header
-      className={`w-full transition-colors duration-200 ${
+      className={`w-full transition-colors duration-200  ${
         scrolled || open
-          ? "bg-white/80 border-b border-gray-200 shadow-sm backdrop-blur-sm"
-          : "bg-transparent border-b border-transparent"
+          ? "bg-white/80 border-b border-gray-200 shadow-sm backdrop-blur-sm "
+          : "bg-transparent border-b border-transparent "
       }`}>
-      <div className='md:mx-12.5 px-6 lg:px-8 border-b border-gray-200'>
+      <div className='md:mx-12.5 px-6 lg:px-8 '>
         <div className='flex items-center justify-between h-20'>
           {/* LOGO + tagline */}
           <Link href='/' className='flex flex-col items-start'>

@@ -32,7 +32,7 @@ export default function ClientSatisfaction() {
         {clientSatisfactionData.map((item, idx) => (
           <div
             key={idx}
-            className='flex flex-col items-center justify-center text-center'>
+            className='flex flex-col items-center justify-between text-center'>
             <div className='w-12 h-12 md:w-14 md:h-14 bg-white rounded-full flex items-center justify-center mb-6 md:mb-8'>
               <item.icon className='w-6 h-6 md:w-7 md:h-7 text-(--primary) font-normal' />
             </div>
