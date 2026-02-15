@@ -43,7 +43,7 @@ export default function Footer() {
   ];
   return (
     <div>
-      <div className='bg-[#304C3E] text-white py-12 py-17'>
+      <div className='bg-[#304C3E] text-white py-20'>
         <div className='md:mx-12.5 px-6 lg:px-8'>
           <div className='grid grid-cols-1 md:grid-cols-4 gap-8'>
             <div>
