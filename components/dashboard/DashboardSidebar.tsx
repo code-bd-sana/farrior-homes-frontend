@@ -39,8 +39,8 @@ export default function DashboardSidebar() {
   }, [pathname]);
 
   return (
-    <div className='sticky top-20 h-[calc(100vh-8rem)] p-4 border border-[#D1CEC6] rounded-lg flex flex-col justify-between'>
-      <div>
+    <div className='sticky top-20 max-w-88 h-[calc(100vh-8rem)]  border border-[#D1CEC6] rounded-lg flex flex-col justify-between'>
+      <div className='p-4'>
         <h2 className='mb-4 text-[#70706C]'>Profile Overview</h2>
         <ul className='space-y-2'>
           <li>
@@ -144,7 +144,7 @@ export default function DashboardSidebar() {
         </ul>
       </div>
 
-      <div className='mt-6'>
+      <div className='mt-6 border-t border-[#D1CEC6]'>
         <button
           onClick={() => {
             try {
@@ -152,7 +152,7 @@ export default function DashboardSidebar() {
             } catch {}
             window.location.href = "/";
           }}
-          className='py-2 px-4 rounded text-red-600 hover:bg-gray-50'>
+          className='p-4 rounded text-red-600 hover:bg-gray-50'>
           <div className='flex items-center justify-start gap-x-1'>
             <LogOut />
             Logout
