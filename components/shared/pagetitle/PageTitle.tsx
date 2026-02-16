@@ -9,9 +9,9 @@ const PageTitle: React.FC<pageTitle> = (props) => {
     <div className='bg-[#619B7F] text-center py-12'>
       <Title
         title={title}
-        titleClass='text-[64px] text-white'
+        titleClass='text-5xl md:text-[64px] text-white'
         subtitle={subtitle}
-        subtitleClass='text-[24px] text-white jost-400'></Title>
+        subtitleClass='text-xl md:text-[24px] text-white jost-400 max-w-4xl mx-auto'></Title>
     </div>
   );
 };
