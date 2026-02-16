@@ -1,0 +1,105 @@
+import { Check } from "lucide-react";
+
+export default function SubscriptionContent() {
+  const subscriptionData = [
+    {
+      plan: "Free Plan",
+      type: "Starter",
+      price: "$0",
+      priceType: "",
+      description:
+        "Perfect for new users, early-stage buyers, and casual visitors.",
+      buttonText: "Free Plan",
+      status: "active",
+      features: [
+        "Public property browsing (Buy/Rent)",
+        "Basic property search and filters",
+        "Save up to 5 properties to favorites",
+        "Limited dashboard access",
+        "Pulse Check Wizard & role assignment",
+        "Basic document storage (up to 5 documents)",
+        "Read-only access to blog and educational content",
+        "Vendor directory (view-only)",
+        "Limited service booking (pay-per-service)",
+        "Standard email support",
+      ],
+    },
+    {
+      plan: "Premium",
+      type: "Elite/Concierge",
+      price: "$99",
+      priceType: "Life Time",
+      description:
+        "Perfect for new users, early-stage buyers, and casual visitors",
+      buttonText: "Get Started",
+      status: "inactive",
+      features: [
+        "Unlimited saved properties",
+        "All premium services and Messaging",
+        "Full role-based dashboard experience",
+        "Buyer, Seller, and Homeowner journey trackers",
+        "Pulse Check Wizard & role assignment",
+        "Financial readiness score & calculators",
+        "Unlimited document storage",
+        "Document sharing, annotations, and version history",
+        "Automated reminders (deadlines, inspections, renewals)",
+        "Priority customer support",
+      ],
+    },
+  ];
+
+  return (
+    <div className='md:pr-35'>
+      <p className='flex md:hidden text-2xl mb-4 text-center items-center justify-center font-semibold text-(--primary)'>
+        Subscription Plan
+      </p>
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-9'>
+        {subscriptionData.map((subscription, index) => (
+          <div
+            key={index}
+            className='md:max-w-130 mb-8 p-6 border border-(--primary) hover:bg-[#F8FAF9] rounded-lg shadow-sm transition-colors duration-200'>
+            <h2 className='text-2xl '>{subscription.plan}</h2>
+            <p className='text-xs mb-3'>{subscription.type}</p>
+
+            <div className='mt-7'>
+              <p className='text-5xl'>
+                {subscription.price}
+                <span className='text-base text-[#70706C]'>
+                  {subscription.priceType && ` / ${subscription.priceType}`}
+                </span>
+              </p>
+              <p className='text-sm mt-2 text-[#70706C]'>
+                {subscription.description}
+              </p>
+            </div>
+            <div className='my-9'>
+              <button
+                className={`w-full mt-4 px-6 py-2 text-xl  border border-[#D1CEC6] cursor-pointer rounded-md ${subscription.status === "active" ? "bg-white text-(--primary) hover:bg-(--primary) hover:text-white" : "bg-(--primary) hover:bg-[#226142] text-white"}  transition-colors duration-200 `}>
+                {subscription.buttonText}
+              </button>
+            </div>
+
+            <div className='pb-13'>
+              <p className='text-(--primary-text-color) text-2xl'>
+                What’s included:
+              </p>
+              <ul className='list-inside mt-4 space-y-1'>
+                {subscription.features.map((feature, idx) => (
+                  <li
+                    key={idx}
+                    className='text-[#AAAAA6] text-sm flex items-center gap-1'>
+                    <Check
+                      size={16}
+                      className='inline-block mr-2 text-(--primary)'
+                    />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
