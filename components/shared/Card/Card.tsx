@@ -77,7 +77,7 @@ const Card: React.FC<CardProps> = (props) => {
   };
   return (
     <div
-      className={`rounded-lg overflow-hidden shadow-lg bg-white flex flex-col h-full ${className}`}>
+      className={`rounded-lg overflow-hidden border border-[#D1CEC6] hover:border-[#8F8A7E] hover:shadow-lg  transition-colors duration-400 bg-white flex flex-col h-full ${className}`}>
       {imageUrl && (
         <div className='relative h-64 w-full'>
           <Image

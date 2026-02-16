@@ -77,7 +77,7 @@ export default function Navbar() {
             <Link
               href='/login'
               className='
-                text-xl text-gray-700
+                text-xl text-(--primary-text-color)
                 hover:text-gray-900 transition-colors duration-200
               '>
               Login
@@ -135,7 +135,7 @@ export default function Navbar() {
                   onClick={() => setOpen(false)}
                   className='
                     py-3 px-4 text-center text-base font-medium
-                    text-gray-700 hover:bg-gray-50 rounded-lg transition-colors
+                    text-(--primary-text-color) hover:bg-gray-50 rounded-lg transition-colors
                   '>
                   Login
                 </Link>
