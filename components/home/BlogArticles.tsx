@@ -43,7 +43,7 @@ export default function BlogArticles() {
     },
   ];
   return (
-    <div className='py-1 mb-16 md:mb-20'>
+    <div className='py-1 mb-16 md:mb-10 md:mx-12.5'>
       <div className='flex flex-col items-center justify-center text-center px-4 md:px-8 mb-10'>
         <Title
           title={"Blog and Articles"}
@@ -56,14 +56,14 @@ export default function BlogArticles() {
           }
         />
       </div>
-      <div className='max-w-450 mx-auto px-4 md:px-8 mt-8'>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 justify-between lg:grid-cols-4'>
+      <div className='px-4 md:px-8 mt-8'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6 justify-between lg:grid-cols-4'>
           {blogs.map((blog, idx) => (
             <BlogCard blog={blog} key={idx + 1} />
           ))}
         </div>
       </div>
-      <div className='flex justify-center items-center text-center mt-6'>
+      <div className='flex justify-center items-center text-center mt-9'>
         <ViewButton label='View All Articles' href='/blog' />
       </div>
     </div>

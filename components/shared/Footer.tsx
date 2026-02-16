@@ -133,8 +133,8 @@ export default function Footer() {
       {/* Footer Bottom */}
       <div className='flex flex-col md:flex-row gap-2 justify-between items-center md:mx-12.5 text-[#304C3E] p-5'>
         <div className='text-center text-sm '>
-          Copyright &copy; {new Date().getFullYear()} 2026 Farrior Homes INC.
-          All Rights Reserved.
+          Copyright &copy; {new Date().getFullYear()} Farrior Homes INC. All
+          Rights Reserved.
         </div>
         <div>
           <ul className='flex space-x-4 justify-center text-sm'>
