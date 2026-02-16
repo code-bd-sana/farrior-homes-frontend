@@ -57,7 +57,7 @@ export default function SubscriptionContent() {
         {subscriptionData.map((subscription, index) => (
           <div
             key={index}
-            className='md:max-w-130 mb-8 p-6 border border-(--primary) hover:bg-[#F8FAF9] rounded-lg shadow-sm transition-colors duration-200'>
+            className=' mb-8 p-4 md:p-6 border border-(--primary) hover:bg-[#F8FAF9] rounded-lg shadow-sm transition-colors duration-200'>
             <h2 className='text-2xl '>{subscription.plan}</h2>
             <p className='text-xs mb-3'>{subscription.type}</p>
 
@@ -72,14 +72,14 @@ export default function SubscriptionContent() {
                 {subscription.description}
               </p>
             </div>
-            <div className='my-9'>
+            <div className='my-6 md:my-9'>
               <button
                 className={`w-full mt-4 px-6 py-2 text-xl  border border-[#D1CEC6] cursor-pointer rounded-md ${subscription.status === "active" ? "bg-white text-(--primary) hover:bg-(--primary) hover:text-white" : "bg-(--primary) hover:bg-[#226142] text-white"}  transition-colors duration-200 `}>
                 {subscription.buttonText}
               </button>
             </div>
 
-            <div className='pb-13'>
+            <div className=''>
               <p className='text-(--primary-text-color) text-2xl'>
                 What’s included:
               </p>
@@ -87,7 +87,7 @@ export default function SubscriptionContent() {
                 {subscription.features.map((feature, idx) => (
                   <li
                     key={idx}
-                    className='text-[#AAAAA6] text-sm flex items-center gap-1'>
+                    className='text-[#70706C] text-sm flex items-center gap-1'>
                     <Check
                       size={16}
                       className='inline-block mr-2 text-(--primary)'
