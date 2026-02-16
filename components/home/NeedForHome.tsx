@@ -33,7 +33,7 @@ export default function NeedForHome() {
           subtitleClass='text-lg max-w-150 text-xl md:text-[24px] mb-6 md:mb-7 max-w-[830px]'
         />
       </div>
-      <div className='max-w-350 mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16 px-6 md:px-12 '>
+      <div className='max-w-350 mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-6 px-6 md:px-12 '>
         {needForHomeData.map((item, idx) => (
           <div
             key={idx}

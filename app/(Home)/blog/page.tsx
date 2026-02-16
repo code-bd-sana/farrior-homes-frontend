@@ -48,8 +48,8 @@ const page = () => {
         title='Blog and Articles'
         subtitle='Insights and tips from our experts'
       />
-      <div className='max-w-460 mx-auto px-8 mt-8'>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 justify-between lg:grid-cols-4'>
+      <div className='max-w-460 mx-auto px-8 mt-8 my-4'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6 justify-between lg:grid-cols-4'>
           {blogs.map((blog, idx) => (
             <BlogCard blog={blog} key={idx + 1} />
           ))}

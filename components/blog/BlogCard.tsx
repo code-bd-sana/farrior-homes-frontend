@@ -25,7 +25,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, variant = "vertical" }) => {
   // };
 
   return (
-    <div className=' '>
+    <div className=''>
       <Card
         key={blog.id}
         id={blog.id}
