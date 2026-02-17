@@ -1,6 +1,6 @@
+import Title from "@/components/shared/Title/Title";
+import ViewButton from "@/components/shared/ViewButton/ViewButton";
 import Image from "next/image";
-import Title from "../shared/Title/Title";
-import ViewButton from "../shared/ViewButton/ViewButton";
 
 export default function AboutContent() {
   return (
