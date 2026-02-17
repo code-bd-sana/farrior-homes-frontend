@@ -77,8 +77,6 @@ export default function Navbar() {
     if (!isLoggedIn) return;
     // Schedule state sync asynchronously to avoid synchronous setState inside effect
     const t = setTimeout(() => {
-      // Keep the mobile dropdown closed by default on page load.
-      // Only initialize which sub-section should be active when opened.
       if (pathname === "/profile") {
         setMobileOverviewOpen(true);
         setMobileSettingsOpen(false);

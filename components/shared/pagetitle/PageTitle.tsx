@@ -11,7 +11,8 @@ const PageTitle: React.FC<pageTitle> = (props) => {
         title={title}
         titleClass='text-5xl md:text-[64px] text-white'
         subtitle={subtitle}
-        subtitleClass='text-xl md:text-[24px] text-white jost-400 max-w-4xl mx-auto'></Title>
+        subtitleClass='text-xl md:text-[23px] text-white jost-400 max-w-4xl mx-auto pt-4'
+      />
     </div>
   );
 };
