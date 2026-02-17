@@ -21,7 +21,7 @@ export default function AboutContent() {
               }
               titleClass={"text-3xl md:text-[48px] mt-5 max-w-[600px]"}
               subtitleClass={
-                "text-xl md:text-[22px] text-[#70706C] max-w-[700px] jost-400 mt-28"
+                "text-xl md:text-[22px] text-[#70706C] max-w-[700px] jost-400 mt-5 md:mt-28"
               }
             />
 
@@ -33,7 +33,7 @@ export default function AboutContent() {
           </div>
 
           {/* Right Image */}
-          <div className='relative w-full h-full min-h-125 lg:min-h-150'>
+          <div className='relative w-full h-full min-h-125 lg:min-h-150 pl-3'>
             <div className='relative w-full h-full'>
               {/* Background shadow effect */}
               <div

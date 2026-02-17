@@ -24,7 +24,7 @@ const HomeBanner = () => {
         <div className='absolute inset-0 bg-black/55 md:bg-black/35' />
 
         {/* Content overlay */}
-        <div className='relative z-10 h-full flex items-center justify-start text-start md:px-12.5 px-5 mt-10'>
+        <div className='relative z-10 h-full flex items-center justify-start text-start md:mx-12.5 px-6 lg:px-8  mt-10'>
           <div className='max-w-5xl '>
             <Title
               title={"Your Trusted Real Estate Partner in the South Suburbs"}
