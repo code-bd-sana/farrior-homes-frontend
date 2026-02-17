@@ -9,6 +9,6 @@ export interface PaginationProps {
   totalPages: number;
   total?: number;
   perPage?: number;
-  onPageChange: (page: number) => void;
+  onPageChange: (page: number) => void; // make it required
   maxButtons?: number;
 }

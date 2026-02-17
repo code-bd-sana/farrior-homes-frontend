@@ -1,6 +1,7 @@
 "use client";
 
-import { PaginationData, PaginationProps } from "./type";
+import React from "react";
+import { PaginationProps } from "./type";
 
 export default function Pagination({
   currentPage,
@@ -18,42 +19,43 @@ export default function Pagination({
     start = Math.max(end - maxButtons + 1, 1);
   }
 
-  const pages = [];
+  const pages: number[] = [];
   for (let i = start; i <= end; i++) pages.push(i);
 
-  return (
-    <div className='flex justify-between items-center mt-4'>
-      {total && (
-        <div>
-          Showing {(currentPage - 1) * perPage + 1} -{" "}
-          {Math.min(currentPage * perPage, total)} of {total}
-        </div>
-      )}
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    onPageChange(page);
+  };
 
+  return (
+    <div className='flex flex-col md:flex-row justify-center items-center mt-4 gap-2'>
       <div className='flex gap-1'>
+        {/* Prev Button */}
         <button
           disabled={currentPage === 1}
-          onClick={() => onPageChange(currentPage - 1)}
-          className='px-3 py-1 border rounded disabled:opacity-50'>
-          Prev
+          onClick={() => handlePageChange(currentPage - 1)}
+          className='px-3 py-1 cursor-pointer rounded disabled:opacity-50 hover:bg-gray-100'>
+          + Previous
         </button>
 
+        {/* Numbered Buttons */}
         {pages.map((page) => (
           <button
             key={page}
-            onClick={() => onPageChange(page)}
-            className={`px-3 py-1 border rounded ${
-              currentPage === page ? "bg-gray-200 font-bold" : ""
+            onClick={() => handlePageChange(page)}
+            className={`px-3 py-1 cursor-pointer rounded text-[#1B1B1A] font-[500] hover:bg-gray-100 ${
+              currentPage === page ? "bg-[#E2E8E5] " : ""
             }`}>
             {page}
           </button>
         ))}
 
+        {/* Next Button */}
         <button
           disabled={currentPage === totalPages}
-          onClick={() => onPageChange(currentPage + 1)}
-          className='px-3 py-1 border rounded disabled:opacity-50'>
-          Next
+          onClick={() => handlePageChange(currentPage + 1)}
+          className='px-3 py-1 text-[#1B1B1A] cursor-pointer rounded disabled:opacity-50 '>
+          {" Next   +"}
         </button>
       </div>
     </div>

@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import SubscriptionContent from "./subscription/SubscriptionContent";
+import TestTablePage from "../table/testTable";
 
 export default function DashboardLContent() {
   const pathname = usePathname();
@@ -65,6 +66,11 @@ export default function DashboardLContent() {
       {pathname === "/subscription" && (
         <div>
           <SubscriptionContent />
+        </div>
+      )}
+      {pathname === "/testTable" && (
+        <div>
+          <TestTablePage />
         </div>
       )}
 

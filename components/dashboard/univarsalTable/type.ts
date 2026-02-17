@@ -21,7 +21,7 @@ export interface TableControls {
 export interface UniversalTableProps {
   title: string;
   columns: string[];
-  data: [];
-  paginaton: PaginationData;
+  data: object[];
+  pagination: PaginationData;
   controls?: TableControls;
 }
