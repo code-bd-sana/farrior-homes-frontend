@@ -1,11 +1,9 @@
 "use client";
 
 import Title from "@/components/shared/Title/Title";
-import { useState } from "react";
+import Accordion from "@/components/shared/Accordion/Accordion";
 
 export default function OfferContent() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
   const communityData = [
     {
       title: "Free Consultations",
@@ -24,51 +22,18 @@ export default function OfferContent() {
     },
   ];
 
-  const handleToggle = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
-
   return (
     <div className='md:mx-12.5 px-6 lg:px-8 mt-12 md:mt-28 mb-6 md:mb-12'>
       <div className='md:mx-24'>
         <div className='grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-18 items-center justify-between'>
           {/* Left Content — Accordion */}
           <div className='col-span-1 md:col-span-7'>
-            <div
-              className='rounded-2xl overflow-hidden'
-              style={{ backgroundColor: "#619B7F" }}>
-              {communityData.map((item, index) => {
-                const isOpen = openIndex === index;
-                return (
-                  <div
-                    key={index}
-                    className={`border-white/20 ${
-                      index !== 0 ? "border-t" : ""
-                    }`}>
-                    {/* Header Row */}
-                    <button
-                      onClick={() => handleToggle(index)}
-                      className='w-full flex items-center justify-between px-8 py-6 text-left'>
-                      <span className='text-white text-xl md:text-2xl'>
-                        {item.title}
-                      </span>
-                      <span className='text-white text-2xl md:text-3xl font-light leading-none shrink-0 ml-4'>
-                        {isOpen ? "−" : "+"}
-                      </span>
-                    </button>
-
-                    {/* Drawer Content */}
-                    {isOpen && (
-                      <div className='px-8 pb-8'>
-                        <p className='text-white/80 text-[16px] max-w-200 leading-relaxed'>
-                          {item.description}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            <Accordion
+              items={communityData}
+              bgColor='bg-[#619B7F]'
+              titleClass='text-white !text-[18px] md:!text-2xl'
+              containerClass='rounded-2xl overflow-hidden px-5'
+            />
           </div>
 
           {/* Right Content */}
