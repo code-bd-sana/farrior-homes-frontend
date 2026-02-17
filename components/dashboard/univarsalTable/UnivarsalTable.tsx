@@ -1,4 +1,6 @@
 import Pagination from "@/components/pagination/Pagination";
+import Image from "next/image";
+import Link from "next/link";
 import { UniversalTableProps } from "./type";
 
 const UnivarsalTable = ({
@@ -7,6 +9,7 @@ const UnivarsalTable = ({
   data,
   pagination,
   controls,
+  action,
 }: UniversalTableProps) => {
   return (
     <div>
@@ -47,19 +50,44 @@ const UnivarsalTable = ({
               </tr>
             </thead>
             <tbody>
-              {data.map((row, idx) => (
-                <tr key={idx} className='hover:bg-gray-50 '>
-                  {columns.map((col) => {
-                    // col er value ke lower case kore data object theke fetch kora
-                    const key = col.charAt(0).toLowerCase() + col.slice(1);
+              {data.map((row, rowIdx) => (
+                <tr key={rowIdx} className='hover:bg-gray-50'>
+                  {Object.keys(row).map((key, colIdx) => {
+                    const value = row[key as keyof typeof row];
+
+                    const isImageKey =
+                      key.toLowerCase().includes("image") ||
+                      key.toLowerCase().includes("profile") ||
+                      key.toLowerCase().includes("photo") ||
+                      key.toLowerCase().includes("picture") ||
+                      key.toLowerCase().includes("avatar") ||
+                      key.toLowerCase().includes("img");
+
                     return (
                       <td
-                        key={col}
-                        className='px-4 py-2 border border-[#D1CEC6] text-[#70706C]'>
-                        {row[key as keyof typeof row] ?? "-"}
+                        key={colIdx}
+                        className={`px-4 text-center py-2 border border-[#D1CEC6] ${value == "premium" ? "text-[#619B7F] " : "text-[#70706C] "} `}>
+                        {isImageKey ? (
+                          <Image
+                            src={value}
+                            alt={key}
+                            className='w-12 h-12 rounded-full object-cover'
+                            width={200}
+                            height={200}
+                          />
+                        ) : (
+                          <span
+                            className={`${value === "premium" || value === "free" ? "bg-[#F1F5F3] py-2 px-6 rounded-2xl" : ""}`}>
+                            {value}
+                          </span>
+                        )}
                       </td>
                     );
                   })}
+
+                  <td className='px-4 underline py-2 border border-[#D1CEC6] text-[#70706C]'>
+                    <Link href={action.link}> {action.text}</Link>
+                  </td>
                 </tr>
               ))}
             </tbody>

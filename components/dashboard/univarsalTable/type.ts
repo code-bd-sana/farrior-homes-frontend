@@ -6,6 +6,10 @@ export interface TableControls {
   onSortChange?: (value: string) => void;
   onPageChange: (page: number) => void;
 }
+export interface Action {
+  text: string;
+  link: string;
+}
 
 export interface SortOption {
   label: string;
@@ -24,4 +28,5 @@ export interface UniversalTableProps {
   data: object[];
   pagination: PaginationData;
   controls?: TableControls;
+  action: Action;
 }
