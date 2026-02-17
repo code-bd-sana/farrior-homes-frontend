@@ -1,6 +1,6 @@
+import MiniCard from "@/components/shared/MiniCard/MiniCard";
+import Title from "@/components/shared/Title/Title";
 import { GrMap } from "react-icons/gr";
-import Title from "../shared/Title/Title";
-import MiniCard from "../shared/MiniCard/MiniCard";
 import { LuFileBadge, LuHandshake } from "react-icons/lu";
 import { RiMoneyDollarCircleLine } from "react-icons/ri";
 
@@ -65,7 +65,6 @@ export default function CommunityContent() {
                   icon={<item.icon />}
                   title={item.title}
                   description={item.description}
-                  
                 />
               ))}
             </div>
