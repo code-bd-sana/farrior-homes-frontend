@@ -1,7 +1,7 @@
 "use client";
 
+import Title from "@/components/shared/Title/Title";
 import { useState } from "react";
-import Title from "../shared/Title/Title";
 
 export default function OfferContent() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
