@@ -47,7 +47,7 @@ export default function InvestmentContent() {
   ];
 
   return (
-    <div className='-mt-8 -mb-7 md:-mb-23'>
+    <div className='-mt-8 -mb-7 md:-mb-22'>
       <ResourceGridSection
         title='Investment Strategies'
         subtitle='Proven approaches to help you build and grow your real estate investment portfolio'
