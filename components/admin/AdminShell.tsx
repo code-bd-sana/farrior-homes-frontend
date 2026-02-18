@@ -264,7 +264,7 @@ export default function AdminShell({ children }: AdminShellProps) {
         </aside>
 
         {/* Page content */}
-        <main className='flex-1 p-4 md:p-6 lg:p-8 min-w-0'>{children}</main>
+        <main className='flex-1 p-4 md:p-12 min-w-0'>{children}</main>
       </div>
 
       {/* ── MOBILE SIDEBAR OVERLAY ── */}

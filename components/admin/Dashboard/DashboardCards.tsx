@@ -27,7 +27,7 @@ export default function DashboardCards() {
     },
     {
       icon: LuCircleDollarSign,
-      title: "$169,564.00",
+      title: "$169,564",
       subTitle: "Total Revenue",
     },
     {
@@ -43,7 +43,7 @@ export default function DashboardCards() {
   ];
   return (
     <div>
-      <div className='grid grid-cols-2 md:grid-cols-6 gap-6 '>
+      <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 '>
         {cardsData.map((card, index) => (
           <MiniCard
             key={index}
