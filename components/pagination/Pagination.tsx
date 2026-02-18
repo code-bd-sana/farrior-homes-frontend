@@ -43,7 +43,7 @@ export default function Pagination({
           <button
             key={page}
             onClick={() => handlePageChange(page)}
-            className={`px-3 py-1 cursor-pointer rounded text-[#1B1B1A] font-[500] hover:bg-gray-100 ${
+            className={`px-3 py-1 cursor-pointer rounded text-[#1B1B1A] font-medium hover:bg-gray-100 ${
               currentPage === page ? "bg-[#E2E8E5] " : ""
             }`}>
             {page}

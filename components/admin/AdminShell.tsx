@@ -223,7 +223,7 @@ export default function AdminShell({ children }: AdminShellProps) {
                 alt='Farrior Homes'
                 width={140}
                 height={50}
-                className='h-9 w-auto object-contain'
+                className='h-12 w-auto object-contain'
               />
             </Link>
             <button
@@ -264,7 +264,7 @@ export default function AdminShell({ children }: AdminShellProps) {
         </aside>
 
         {/* Page content */}
-        <main className='flex-1 p-4 md:p-12 min-w-0'>{children}</main>
+        <main className='flex-1 p-4 md:p-11 min-w-0'>{children}</main>
       </div>
 
       {/* ── MOBILE SIDEBAR OVERLAY ── */}

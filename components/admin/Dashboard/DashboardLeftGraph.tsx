@@ -40,7 +40,7 @@ export default function DashboardLeftGraph() {
       <p className='text-xl md:text-2xl border-b border-[#D1CEC6] pb-3 mb-4'>
         Revenue Trend
       </p>
-      <div className='w-full h-60 md:h-80 lg:h-186 -ml-8 md:ml-0'>
+      <div className='w-full h-70 md:h-80 lg:h-186 -ml-5 md:ml-0'>
         <ResponsiveContainer width='100%' height='100%'>
           <BarChart
             data={barValue}
@@ -85,7 +85,7 @@ export default function DashboardLeftGraph() {
               labelStyle={{ color: "#304C3E", fontWeight: "bold" }}
               itemStyle={{ color: "#619B7F", fontWeight: "500" }}
               wrapperStyle={{ color: "#619B7F" }}
-              cursor={{ fill: "rgba(209, 227, 217, 0.3)" }}
+              cursor={{ fill: "rgba(209, 227, 217, 0)" }}
             />
             <Bar
               dataKey='revenue'
@@ -94,6 +94,7 @@ export default function DashboardLeftGraph() {
               strokeWidth={1}
               radius={[7, 7, 0, 0]}
               maxBarSize={isMobile ? 40 : 100}
+              activeBar={{ fill: "#619B7F" }}
             />
           </BarChart>
         </ResponsiveContainer>
