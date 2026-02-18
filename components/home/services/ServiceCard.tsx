@@ -91,12 +91,12 @@ export default function ServiceCard() {
   ];
 
   return (
-    <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
+    <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6'>
       {services.map((service, idx) => (
         <div key={idx} className='border border-gray-300 rounded-lg p-6 mb-6'>
           <h3 className='text-xl font-semibold mb-2'>{service.title}</h3>
           <p className='text-gray-700 mb-4'>{service.description}</p>
-          <ul className='list-disc list-inside text-gray-600'>
+          <ul className='list-disc mt-24 flex flex-col justify-end end list-inside text-gray-600  marker:text-[#619B7F]'>
             {service.features.map((feature, fidx) => (
               <li key={fidx}>{feature}</li>
             ))}
