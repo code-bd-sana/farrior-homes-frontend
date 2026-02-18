@@ -2,6 +2,7 @@ export type Property = {
   id: number;
   title: string;
   price: string | number;
+  createdAt?: string;
   bedrooms?: number;
   bathrooms?: number;
   sqft?: number;
