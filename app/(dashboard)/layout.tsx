@@ -11,8 +11,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
       {/* Main content */}
       <main className='flex-1'>{children}</main>
-
-      <Footer />
     </>
   );
 }
