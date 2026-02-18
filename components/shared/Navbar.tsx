@@ -126,7 +126,8 @@ export default function Navbar() {
           </Link>
 
           {/* DESKTOP NAV */}
-          <nav className='hidden lg:flex items-center gap-6 flex-1 justify-start ml-25'>
+          <nav
+            className={`hidden ${pathname.includes("admin") && "lg:hidden"} lg:flex items-center gap-6 flex-1 justify-start ml-25`}>
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
