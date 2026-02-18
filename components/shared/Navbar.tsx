@@ -24,6 +24,8 @@ const navItems = [
   { label: "Contact us", href: "/contact" },
 ];
 
+const USER_ROLE: "user" | "admin" = "user";
+
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [mobileProfileOpen, setMobileProfileOpen] = useState(false);
@@ -35,7 +37,6 @@ export default function Navbar() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    // Read localStorage after mount asynchronously to avoid hydration mismatch.
     const t = setTimeout(() => {
       try {
         setIsLoggedIn(localStorage.getItem("isLoggedIn") !== "false");
@@ -56,13 +57,14 @@ export default function Navbar() {
   }, []);
 
   const router = useRouter();
+  const profilePath = USER_ROLE === "admin" ? "/admin" : "/profile";
 
   const doLogin = () => {
     try {
       localStorage.setItem("isLoggedIn", "true");
     } catch {}
     setIsLoggedIn(true);
-    router.push("/profile");
+    router.push(profilePath);
   };
   const [currentHash, setCurrentHash] = useState("");
 
@@ -116,7 +118,7 @@ export default function Navbar() {
             <div className='flex items-center gap-3'>
               <Image
                 src='/logo.png'
-                alt='Farior Homes'
+                alt='Farrior Homes'
                 width={200}
                 height={80}
                 priority
@@ -171,7 +173,7 @@ export default function Navbar() {
                 </button>
 
                 <Link
-                  href='/profile'
+                  href={profilePath}
                   aria-label='Profile'
                   className='text-gray-700'>
                   <User size={22} />
