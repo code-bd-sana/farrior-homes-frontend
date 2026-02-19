@@ -73,16 +73,13 @@ const AddServiceModal = ({
                 },
               );
             } catch (err) {
-              // fail gracefully if constructor shape is unexpected
-              // eslint-disable-next-line no-console
               console.error("Quill initialization failed:", err);
               quillInstanceRef.current = null;
             }
           }
         }, 100);
       } catch (err) {
-        // helpful error for debugging
-        // eslint-disable-next-line no-console
+        // for debugging
         console.error("Failed to load Quill editor:", err);
       }
     };
