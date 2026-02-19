@@ -7,13 +7,6 @@ import { useRouter } from "next/navigation";
 import { getAllUsers } from "@/lib/userData";
 import type { User } from "@/types/users";
 
-function getSubscriptionStatus(id: number) {
-  // deterministic status so UI is consistent across renders
-  if (id % 3 === 0) return "Premium";
-  if (id % 3 === 1) return "Basic";
-  return "Free";
-}
-
 const _ALL: User[] = getAllUsers();
 
 const PROPERTIES = _ALL.map((user: User) => ({
@@ -23,7 +16,7 @@ const PROPERTIES = _ALL.map((user: User) => ({
   email: user.email ?? "N/A",
   phone: user.phone ?? "N/A",
   address: user.address ?? "N/A",
-  subscription: user.subscription ?? getSubscriptionStatus(user.id),
+  subscription: user.subscription === "Premium" ? "Premium" : "Free",
   propertiesOwn: user.propertiesOwn ?? 0,
   propertiesBuy: user.propertiesBuy ?? 0,
   propertiesSell: user.propertiesSell ?? 0,
@@ -52,14 +45,14 @@ export default function UserManagement() {
 
       {/* Table */}
       <div className='overflow-x-auto px-5'>
-        <table className='w-full text-sm text-[#1B1B1A]'>
+        <table className='w-full text-sm text-(--primary-text-color) '>
           <thead>
             <tr className='border border-[#D1CEC6]'>
               <th className='px-4 py-3 text-left font-medium w-28 border border-[#E8E5DD]'>
                 Profile
               </th>
               <th className='px-4 py-3 text-left font-medium border border-[#E8E5DD]'>
-                Name
+                User Name
               </th>
               <th className='px-4 py-3 text-left font-medium border border-[#E8E5DD]'>
                 Email Address
@@ -89,16 +82,14 @@ export default function UserManagement() {
           </thead>
           <tbody className='border border-[#D1CEC6]'>
             {paginated.map((user) => (
-              <tr
-                key={user.id}
-                className='border border-[#E8E5DD] hover:bg-gray-50 transition-colors'>
+              <tr key={user.id} className=' hover:bg-gray-50 transition-colors'>
                 {/* Thumbnail */}
                 <td className='px-4 py-3 border border-[#E8E5DD]'>
-                  <div className='w-12 h-10 rounded overflow-hidden bg-gray-100 shrink-0'>
+                  <div className='w-10 h-10 rounded-full overflow-hidden bg-gray-100 shrink-0'>
                     <Image
                       src={user.image}
                       alt={user.profileName}
-                      width={48}
+                      width={40}
                       height={40}
                       className='w-full h-full object-cover'
                     />
@@ -127,7 +118,12 @@ export default function UserManagement() {
 
                 {/* Subscription */}
                 <td className='px-4 py-3 text-[#70706C] border border-[#E8E5DD]'>
-                  <span className='inline-flex items-center px-3 py-1 rounded-lg border border-[#D1CEC6] text-[12px] bg-[#F8FAF9] whitespace-nowrap'>
+                  <span
+                    className={`inline-flex items-center px-3 py-1 rounded-2xl border text-[12px] whitespace-nowrap bg-[#F1F5F3] ${
+                      user.subscription === "Premium"
+                        ? " text-[#619B7F] border-[#CFE6FF]"
+                        : "text-(--primary-text-color) border-[#D1CEC6]"
+                    }`}>
                     {user.subscription}
                   </span>
                 </td>
@@ -162,7 +158,7 @@ export default function UserManagement() {
       </div>
 
       {/* Pagination */}
-      <div className='px-4 py-4 border-t border-[#D1CEC6]'>
+      <div className='px-4 py-4 '>
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}

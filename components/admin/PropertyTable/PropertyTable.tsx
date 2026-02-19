@@ -142,7 +142,7 @@ export default function PropertyTable() {
       </div>
 
       {/* Pagination */}
-      <div className='px-4 py-4 border-t border-[#D1CEC6]'>
+      <div className='px-4 py-4'>
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}

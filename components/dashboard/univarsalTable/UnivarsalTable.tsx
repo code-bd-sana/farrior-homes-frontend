@@ -43,7 +43,7 @@ const UnivarsalTable = ({
                 {columns.map((col) => (
                   <th
                     key={col}
-                    className='px-4 text-sm font-[500] py-2 text-left border border-[#D1CEC6]'>
+                    className='px-4 text-sm font-medium py-2 text-left border border-[#D1CEC6]'>
                     {col}
                   </th>
                 ))}

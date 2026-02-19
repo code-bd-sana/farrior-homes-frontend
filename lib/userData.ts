@@ -3,7 +3,7 @@ import { User } from "@/types/users";
 const users: User[] = [
   {
     id: 1,
-    profileImage: "/avatars/michael.png",
+    profileImage: "/user.png",
     name: "Michael Farrior",
     email: "michaelfarrior@farriorthomes.com",
     phone: "(708) 953-1795",
@@ -17,7 +17,7 @@ const users: User[] = [
   },
   {
     id: 2,
-    profileImage: "/avatars/sarah.png",
+    profileImage: "/user.png",
     name: "Sarah Agent",
     email: "sarah@oakrealty.com",
     phone: "(555) 123-4567",
@@ -31,7 +31,7 @@ const users: User[] = [
   },
   {
     id: 3,
-    profileImage: "/avatars/downtown.png",
+    profileImage: "/user.png",
     name: "Downtown Realty",
     email: "info@citybrokers.com",
     phone: "(555) 987-6543",
@@ -45,7 +45,7 @@ const users: User[] = [
   },
   {
     id: 4,
-    profileImage: "/avatars/urban.png",
+    profileImage: "/user.png",
     name: "Urban Living Realty",
     email: "info@cityhomes.com",
     phone: "(555) 555-5555",
@@ -59,7 +59,7 @@ const users: User[] = [
   },
   {
     id: 5,
-    profileImage: "/avatar.png",
+    profileImage: "/user.png",
     name: "Family Homes Co.",
     email: "hello@suburbrealty.com",
     phone: "(555) 222-3333",
@@ -73,7 +73,7 @@ const users: User[] = [
   },
   {
     id: 6,
-    profileImage: "/avatar.png",
+    profileImage: "/user.png",
     name: "Green Living Homes",
     email: "info@sustainablerealty.com",
     phone: "(555) 999-9999",
@@ -87,7 +87,7 @@ const users: User[] = [
   },
   {
     id: 7,
-    profileImage: "/avatar.png",
+    profileImage: "/user.png",
     name: "Luxury Living",
     email: "info@luxuryliving.com",
     phone: "(555) 777-7777",
@@ -101,7 +101,7 @@ const users: User[] = [
   },
   {
     id: 8,
-    profileImage: "/avatar.png",
+    profileImage: "/user.png",
     name: "Coastal Living",
     email: "info@coastalliving.com",
     phone: "(555) 404-0404",
@@ -115,7 +115,7 @@ const users: User[] = [
   },
   {
     id: 9,
-    profileImage: "/avatar.png",
+    profileImage: "/user.png",
     name: "Creative Living",
     email: "info@creativeliving.com",
     phone: "(555) 505-0505",
@@ -129,7 +129,7 @@ const users: User[] = [
   },
   {
     id: 10,
-    profileImage: "/avatar.png",
+    profileImage: "/user.png",
     name: "Rural Living Realty",
     email: "info@rurallivingrealty.com",
     phone: "(555) 808-0808",
