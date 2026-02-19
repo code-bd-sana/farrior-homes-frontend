@@ -18,7 +18,7 @@ const Discover = () => {
     <section className='py-8'>
       <div className='md:mx-12.5 px-6 lg:px-8'>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
-          {recentProperties.map((p) => (
+          {properties.slice(0, 4).map((p) => (
             <Card
               id={p.id}
               key={p.id}
