@@ -6,7 +6,7 @@ export type User = {
   phone?: string;
   company?: string;
   address?: string;
-  subscription?: "Free" | "Basic" | "Premium" | string;
+  subscription?: "Premium" | "Free" | string;
   propertiesOwn?: number;
   propertiesBuy?: number;
   propertiesSell?: number;

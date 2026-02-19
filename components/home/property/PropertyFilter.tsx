@@ -35,6 +35,7 @@ export default function PropertyFilter() {
   const [showLocation, setShowLocation] = useState(true);
   const [showSquareFeet, setShowSquareFeet] = useState(true);
   const [showBedrooms, setShowBedrooms] = useState(true);
+
   const [showBathrooms, setShowBathrooms] = useState(true);
 
   /**
@@ -59,7 +60,7 @@ export default function PropertyFilter() {
   };
 
   return (
-    <div className='w-[15  0px] md:w-[301px] p-6 border border-gray-300 rounded-lg'>
+    <div className='w-[15  0px] md:w-75.25 p-6 border border-gray-300 rounded-lg'>
       <div className='flex justify-between mb-4'>
         <h2 className='text-xl font-semibold'>Filters</h2>
         <button className='text-red-500 cursor-pointer' onClick={clearFilters}>

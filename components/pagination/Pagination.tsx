@@ -35,7 +35,7 @@ export default function Pagination({
           disabled={currentPage === 1}
           onClick={() => handlePageChange(currentPage - 1)}
           className='px-3 py-1 cursor-pointer rounded disabled:opacity-50 hover:bg-gray-100'>
-          {"< Previous"}
+          + Previous
         </button>
 
         {/* Numbered Buttons */}
@@ -55,7 +55,7 @@ export default function Pagination({
           disabled={currentPage === totalPages}
           onClick={() => handlePageChange(currentPage + 1)}
           className='px-3 py-1 text-[#1B1B1A] cursor-pointer rounded disabled:opacity-50 '>
-          {" Next   >"}
+          {" Next   +"}
         </button>
       </div>
     </div>

@@ -3,15 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  Menu,
-  X,
-  Bell,
-  User,
-  ChevronDown,
-  ChevronUp,
-  Settings as SettingsIcon,
-} from "lucide-react";
+import { Menu, X, Bell, User, User2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 
@@ -28,9 +20,6 @@ const USER_ROLE: "user" | "admin" = "user";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const [mobileProfileOpen, setMobileProfileOpen] = useState(false);
-  const [mobileOverviewOpen, setMobileOverviewOpen] = useState(false);
-  const [mobileSettingsOpen, setMobileSettingsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -57,7 +46,8 @@ export default function Navbar() {
   }, []);
 
   const router = useRouter();
-  const profilePath = USER_ROLE === "admin" ? "/admin" : "/profile";
+  const profilePath = USER_ROLE === "admin" ? "/admin" : "/dashboard/profile";
+  const isUserDashboardRoute = pathname.startsWith("/dashboard");
 
   const doLogin = () => {
     try {
@@ -66,42 +56,17 @@ export default function Navbar() {
     setIsLoggedIn(true);
     router.push(profilePath);
   };
-  const [currentHash, setCurrentHash] = useState("");
+
+  const openUserDashboardSidebar = () => {
+    if (typeof window === "undefined") return;
+    window.dispatchEvent(new CustomEvent("toggle-user-sidebar"));
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    if (!isLoggedIn) return;
-    // Schedule state sync asynchronously to avoid synchronous setState inside effect
-    const t = setTimeout(() => {
-      if (pathname === "/profile") {
-        setMobileOverviewOpen(true);
-        setMobileSettingsOpen(false);
-      } else if (pathname === "/notifications" || pathname === "/security") {
-        setMobileOverviewOpen(false);
-        setMobileSettingsOpen(true);
-      } else {
-        setMobileOverviewOpen(false);
-        setMobileSettingsOpen(false);
-      }
-    }, 0);
-    return () => clearTimeout(t);
-  }, [pathname, isLoggedIn]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const t = setTimeout(() => setCurrentHash(window.location.hash || ""), 0);
-    const onHash = () => setCurrentHash(window.location.hash || "");
-    window.addEventListener("hashchange", onHash);
-    return () => {
-      clearTimeout(t);
-      window.removeEventListener("hashchange", onHash);
-    };
   }, []);
 
   return (
@@ -182,178 +147,21 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* MOBILE HAMBURGER */}
+          {/* MOBILE USER ICON & HAMBURGER */}
           <div className='flex items-center gap-3 lg:hidden'>
             {isLoggedIn && (
-              <div className='relative'>
-                <button
-                  onClick={() => setMobileProfileOpen(!mobileProfileOpen)}
-                  className='text-gray-800 focus:outline-none'
-                  aria-label='Mobile profile'>
-                  <User size={26} />
-                </button>
-
-                {mobileProfileOpen && (
-                  <div className='absolute right-0 mt-2 w-60 bg-white border rounded-md shadow-md z-50 p-2'>
-                    <button
-                      onClick={() => setMobileOverviewOpen(!mobileOverviewOpen)}
-                      className={`w-full text-left py-2 px-2 rounded flex items-center justify-between ${
-                        mobileOverviewOpen ? "text-black" : "hover:bg-gray-50"
-                      }`}>
-                      <div className='flex items-center gap-2'>
-                        <User size={18} />
-                        <span>Profile overview</span>
-                      </div>
-                      {mobileOverviewOpen ? (
-                        <ChevronUp size={16} />
-                      ) : (
-                        <ChevronDown size={16} />
-                      )}
-                    </button>
-
-                    {mobileOverviewOpen && (
-                      <div className='ml-4 pl-4 border-l-2 border-gray-300'>
-                        <Link
-                          href='/profile#profileAddress'
-                          onClick={(e) => {
-                            if (pathname === "/profile") {
-                              e.preventDefault();
-                              const el =
-                                document.getElementById("profileAddress");
-                              if (el) {
-                                el.scrollIntoView({ behavior: "smooth" });
-                                window.history.pushState(
-                                  null,
-                                  "",
-                                  "#profileAddress",
-                                );
-                                window.dispatchEvent(
-                                  new HashChangeEvent("hashchange"),
-                                );
-                              }
-                            }
-                            setMobileProfileOpen(false);
-                          }}
-                          className={`block py-2 px-2 rounded ${
-                            pathname === "/profile" &&
-                            currentHash === "#profileAddress"
-                              ? "text-black"
-                              : "hover:bg-gray-50 text-gray-700"
-                          }`}>
-                          Address
-                        </Link>
-                      </div>
-                    )}
-
-                    <Link
-                      href='/subscription'
-                      onClick={() => setMobileProfileOpen(false)}
-                      className={`block py-2 px-2 rounded ${
-                        pathname === "/subscription"
-                          ? "text-black"
-                          : "hover:bg-gray-50 text-gray-700"
-                      }`}>
-                      Subscription plan
-                    </Link>
-
-                    <div>
-                      <button
-                        className={`w-full text-left py-2 px-2 rounded flex items-center justify-between ${
-                          mobileSettingsOpen ? "text-black" : "hover:bg-gray-50"
-                        }`}
-                        onClick={() =>
-                          setMobileSettingsOpen(!mobileSettingsOpen)
-                        }>
-                        <div className='flex items-center gap-2'>
-                          <SettingsIcon size={18} />
-                          <span>Settings</span>
-                        </div>
-                        {mobileSettingsOpen ? (
-                          <ChevronUp size={16} />
-                        ) : (
-                          <ChevronDown size={16} />
-                        )}
-                      </button>
-
-                      {mobileSettingsOpen && (
-                        <div className='ml-4 pl-4 border-l-2 border-gray-300'>
-                          <Link
-                            href='/settings#notifications'
-                            onClick={(e) => {
-                              if (pathname === "/settings") {
-                                e.preventDefault();
-                                const el =
-                                  document.getElementById("notifications");
-                                if (el) {
-                                  el.scrollIntoView({ behavior: "smooth" });
-                                  window.history.pushState(
-                                    null,
-                                    "",
-                                    "#notifications",
-                                  );
-                                  window.dispatchEvent(
-                                    new HashChangeEvent("hashchange"),
-                                  );
-                                }
-                              }
-                              setMobileProfileOpen(false);
-                            }}
-                            className={`block py-2 px-2 rounded ${
-                              pathname === "/settings" &&
-                              currentHash === "#notifications"
-                                ? "text-black"
-                                : "hover:bg-gray-50 text-gray-700"
-                            }`}>
-                            Notification settings
-                          </Link>
-                          <Link
-                            href='/settings#security'
-                            onClick={(e) => {
-                              if (pathname === "/settings") {
-                                e.preventDefault();
-                                const el = document.getElementById("security");
-                                if (el) {
-                                  el.scrollIntoView({ behavior: "smooth" });
-                                  window.history.pushState(
-                                    null,
-                                    "",
-                                    "#security",
-                                  );
-                                  window.dispatchEvent(
-                                    new HashChangeEvent("hashchange"),
-                                  );
-                                }
-                              }
-                              setMobileProfileOpen(false);
-                            }}
-                            className={`block py-2 px-2 rounded ${
-                              pathname === "/settings" &&
-                              currentHash === "#security"
-                                ? "text-black"
-                                : "hover:bg-gray-50 text-gray-700"
-                            }`}>
-                            Security settings
-                          </Link>
-                        </div>
-                      )}
-                      {/* Mobile logout under settings */}
-                      <button
-                        onClick={() => {
-                          try {
-                            localStorage.setItem("isLoggedIn", "false");
-                          } catch {}
-                          setIsLoggedIn(false);
-                          setMobileProfileOpen(false);
-                          // reload to ensure layout updates across app
-                          window.location.href = "/";
-                        }}
-                        className='w-full text-left py-2 px-2 rounded text-red-600 hover:bg-gray-50'>
-                        Logout
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <button
+                onClick={() => {
+                  if (isUserDashboardRoute) {
+                    openUserDashboardSidebar();
+                  } else {
+                    router.push(profilePath);
+                  }
+                }}
+                className='text-gray-800 focus:outline-none'
+                aria-label='Open user menu'>
+                <User2 size={24} />
+              </button>
             )}
 
             <button
