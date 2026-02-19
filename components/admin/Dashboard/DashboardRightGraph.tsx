@@ -36,8 +36,8 @@ export default function DashboardRightGraph() {
     { month: "Aug", sales: 3800 },
     { month: "Sep", sales: 4300 },
     { month: "Oct", sales: 5200 },
-    { month: "Nov", sales: 4900 },
-    { month: "Dec", sales: 3100 },
+    { month: "Nov", sales: 3900 },
+    { month: "Dec", sales: 4100 },
   ];
 
   const userDistributionData = [
