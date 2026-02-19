@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import TestTablePage from "../table/testTable";
 import SubscriptionContent from "./subscription/SubscriptionContent";
-import UserManagement from "../admin/table/UserManagement";
+import UserManagement from "../admin/UserManagementTable/UserManagement";
 
 export default function DashboardLContent() {
   const pathname = usePathname();
