@@ -9,21 +9,6 @@ interface BlogCardProps {
 }
 
 const BlogCard: React.FC<BlogCardProps> = ({ blog, variant = "vertical" }) => {
-  // console.log(blog, "blog is console log");
-
-  const handleBlog = async () => {
-    console.log("console lg");
-  };
-
-  // const cardData = {
-  //   imageUrl: blog.image,
-  //   badge: blog.category,
-  //   title: blog.title,
-  //   subtitle: blog.description,
-  //   type: blog.category,
-  //   primaryActionLabel: "View Details",
-  // };
-
   return (
     <div className=''>
       <Card

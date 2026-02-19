@@ -22,7 +22,6 @@ import {
   LuUserRoundCog,
 } from "react-icons/lu";
 import { FiHome } from "react-icons/fi";
-import { GrSettingsOption } from "react-icons/gr";
 
 type AdminShellProps = {
   children: ReactNode;
@@ -67,11 +66,6 @@ const sidebarSections = [
         label: "Tax Calculation",
         href: "/admin/tax-calculation",
         icon: LuBadgePercent,
-      },
-      {
-        label: "Maintenance",
-        href: "/admin/maintenance",
-        icon: GrSettingsOption,
       },
     ],
   },
@@ -178,7 +172,7 @@ export default function AdminShell({ children }: AdminShellProps) {
 
   return (
     <div className='min-h-screen'>
-      {/* ── STICKY HEADER (full width, split into sidebar-mirror + topnav) ── */}
+      {/* ── STICKY HEADER ── */}
       <header className='sticky top-0 z-50 h-20 border-b border-[#D1CEC6] bg-white flex'>
         {/* Left cell — same width as sidebar, collapses with it */}
         <div
