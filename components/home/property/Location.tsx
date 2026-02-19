@@ -13,7 +13,7 @@ export default function Location({
 
   return (
     <section className='w-full'>
-      <div className='rounded-lg overflow-hidden border border-gray-200 shadow-sm'>
+      <div className='overflow-hidden border border-gray-200 shadow-sm'>
         <div className='relative w-full h-64 md:h-150 '>
           <iframe
             title='property-location'

@@ -29,6 +29,7 @@ const properties: Property[] = [
     yearBuilt: 1998,
     lot: "0.18 Acres",
     status: "For Sale",
+    createdAt: "2025-01-05",
     interior:
       "Open plan living with updated kitchen and hardwood floors throughout.",
     exterior: "Private fenced backyard with patio and mature landscaping.",
@@ -66,6 +67,7 @@ const properties: Property[] = [
     yearBuilt: 2012,
     lot: "N/A",
     status: "For Sale",
+    createdAt: "2025-01-15",
     interior:
       "Open concept living with floor-to-ceiling windows and modern kitchen.",
     exterior: "Secure building with rooftop terrace and city views.",
@@ -108,6 +110,7 @@ const properties: Property[] = [
     yearBuilt: 2005,
     lot: "0.4 Acres",
     status: "For Sale",
+    createdAt: "2025-02-05",
     interior: "Spacious kitchen with island, family room and formal dining.",
     exterior: "Large yard with deck and garden space.",
     financial: {
@@ -141,10 +144,11 @@ const properties: Property[] = [
     ],
     lat: 37.3352,
     lng: -121.8811,
-    propertyType: "Luxury Villa",
+    propertyType: "Family Home",
     yearBuilt: 2019,
     lot: "0.5 Acres",
     status: "For Sale",
+    createdAt: "2025-02-08",
     overview:
       "A stunning modern villa in prestigious Ash Drive, featuring clean lines, premium finishes, and an open-concept layout.",
     keyFeatures: [

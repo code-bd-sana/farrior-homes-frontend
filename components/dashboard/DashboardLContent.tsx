@@ -1,14 +1,16 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import TestTablePage from "../table/testTable";
 import SubscriptionContent from "./subscription/SubscriptionContent";
+import UserManagement from "../admin/UserManagementTable/UserManagement";
 
 export default function DashboardLContent() {
   const pathname = usePathname();
 
   return (
     <div
-      className={`h-full border ${pathname === "/subscription" ? "border-none p-0" : "border-[#D1CEC6] p-4 "} rounded-lg`}>
+      className={`h-full border ${pathname === "/subscription" || "admin" ? "border-none p-0" : "border-[#D1CEC6] p-4 "} rounded-lg`}>
       {/* Profile Page */}
       {pathname === "/profile" && (
         <div>
@@ -65,6 +67,16 @@ export default function DashboardLContent() {
       {pathname === "/subscription" && (
         <div>
           <SubscriptionContent />
+        </div>
+      )}
+      {pathname === "/testTable" && (
+        <div>
+          <TestTablePage />
+        </div>
+      )}
+      {pathname === "/admin/user-management" && (
+        <div>
+          <UserManagement />
         </div>
       )}
 
@@ -134,10 +146,11 @@ export default function DashboardLContent() {
 
       {/* Default State */}
       {pathname !== "/profile" &&
+        pathname !== "/admin" &&
         pathname !== "/subscription" &&
         pathname !== "/settings" && (
-          <div>
-            <h1 className='text-2xl font-bold mb-4'>Dashboard Content</h1>
+          <div className={`${pathname.includes("admin") && "hidden"}`}>
+            <h1 className={`text-2xl  font-bold mb-4`}>Dashboard Content</h1>
             <p>Select an option from the sidebar to view content.</p>
           </div>
         )}
