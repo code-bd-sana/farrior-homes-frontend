@@ -1,21 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
 import {
-  User,
+  Calculator,
   ChevronDown,
   ChevronUp,
-  Settings as SettingsIcon,
-  Home,
   CreditCard,
+  DollarSign,
+  FileText,
+  Home,
   LogOut,
+  Settings as SettingsIcon,
+  User,
+  Warehouse,
 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { FiBookmark, FiGrid, FiHome, FiSettings } from "react-icons/fi";
 
 export default function DashboardSidebar() {
   const [showProfileOverview, setShowProfileOverview] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showMain, setShowMain] = useState(false);
+  const [showTool, setShowTool] = useState(false);
   const pathname = usePathname();
   const [currentHash, setCurrentHash] = useState("");
 
@@ -39,7 +46,147 @@ export default function DashboardSidebar() {
   }, [pathname]);
 
   return (
-    <div className='sticky top-20 max-w-88 h-[calc(100vh-8rem)]  border border-[#D1CEC6] rounded-lg flex flex-col justify-between'>
+    <div className='sticky top-20 max-w-88 h-[calc(100vh-2rem)] border border-[#D1CEC6] rounded-lg flex flex-col justify-between'>
+      <div className='p-4'>
+        <h2 className='mb-4 text-[#70706C]'>Main</h2>
+        <ul className='space-y-2'>
+          <li>
+            <div className='flex flex-col'>
+              <button
+                onClick={() => setShowMain(!showMain)}
+                className={`text-left py-2 px-4 w-full rounded flex items-center justify-between ${
+                  pathname === "/overview"
+                    ? "text-black"
+                    : "hover:bg-gray-100 text-gray-700"
+                }`}>
+                <div className='flex items-center gap-2'>
+                  <FiGrid size={18} />
+                  <Link href='/overview'>Overview</Link>
+                </div>
+              </button>
+            </div>
+          </li>
+          <li>
+            <div className='flex flex-col'>
+              <button
+                onClick={() => setShowMain(!showMain)}
+                className={`text-left py-2 px-4 w-full rounded flex items-center justify-between ${
+                  pathname === "/own-property"
+                    ? "text-black"
+                    : "hover:bg-gray-100 text-gray-700"
+                }`}>
+                <div className='flex items-center gap-2'>
+                  <Warehouse size={18} />
+                  <Link href='/own-property'>Own Property</Link>
+                </div>
+              </button>
+            </div>
+          </li>
+          <li>
+            <div className='flex flex-col'>
+              <button
+                onClick={() => setShowMain(!showMain)}
+                className={`text-left py-2 px-4 w-full rounded flex items-center justify-between ${
+                  pathname === "/sale-property"
+                    ? "text-black"
+                    : "hover:bg-gray-100 text-gray-700"
+                }`}>
+                <div className='flex items-center gap-2'>
+                  <FiHome size={18} />
+                  <Link href='/sale-property'>Sale Property</Link>
+                </div>
+              </button>
+            </div>
+          </li>
+          <li>
+            <div className='flex flex-col'>
+              <button
+                onClick={() => setShowMain(!showMain)}
+                className={`text-left py-2 px-4 w-full rounded flex items-center justify-between ${
+                  pathname === "/save-property"
+                    ? "text-black"
+                    : "hover:bg-gray-100 text-gray-700"
+                }`}>
+                <div className='flex items-center gap-2'>
+                  <FiBookmark size={18} />
+                  <Link href='/save-property'>Save Property</Link>
+                </div>
+              </button>
+            </div>
+          </li>
+          <li>
+            <div className='flex flex-col'>
+              <button
+                onClick={() => setShowMain(!showMain)}
+                className={`text-left py-2 px-4 w-full rounded flex items-center justify-between ${
+                  pathname === "/documents"
+                    ? "text-black"
+                    : "hover:bg-gray-100 text-gray-700"
+                }`}>
+                <div className='flex items-center gap-2'>
+                  <FileText size={18} />
+                  <Link href='/documents'>Documents</Link>
+                </div>
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div className='p-4'>
+        <h2 className='mb-4 text-[#70706C]'>Tool</h2>
+        <ul className='space-y-2'>
+          <li>
+            <div className='flex flex-col'>
+              <button
+                onClick={() => setShowTool(!showTool)}
+                className={`text-left py-2 px-4 w-full rounded flex items-center justify-between ${
+                  pathname === "/property-valuation"
+                    ? "text-black"
+                    : "hover:bg-gray-100 text-gray-700"
+                }`}>
+                <div className='flex items-center gap-2'>
+                  <Calculator size={18} />
+                  <Link href='/property-valuation'>Property Valuation</Link>
+                </div>
+              </button>
+            </div>
+          </li>
+          <li>
+            <div className='flex flex-col'>
+              <button
+                onClick={() => setShowTool(!showTool)}
+                className={`text-left py-2 px-4 w-full rounded flex items-center justify-between ${
+                  pathname === "/tax-calculation"
+                    ? "text-black"
+                    : "hover:bg-gray-100 text-gray-700"
+                }`}>
+                <div className='flex items-center gap-2'>
+                  <DollarSign size={18} />
+                  <Link href='/tax-calculation'>Tax Calculation</Link>
+                </div>
+              </button>
+            </div>
+          </li>
+          <li>
+            <div className='flex flex-col'>
+              <button
+                onClick={() => setShowTool(!showTool)}
+                className={`text-left py-2 px-4 w-full rounded flex items-center justify-between ${
+                  pathname === "/maintenance"
+                    ? "text-black"
+                    : "hover:bg-gray-100 text-gray-700"
+                }`}>
+                <div className='flex items-center gap-2'>
+                  <FiSettings size={18} />
+                  <Link href='/maintenance'>Maintenance</Link>
+                </div>
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+
       <div className='p-4'>
         <h2 className='mb-4 text-[#70706C]'>Profile Overview</h2>
         <ul className='space-y-2'>

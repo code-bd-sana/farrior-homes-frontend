@@ -6,21 +6,22 @@ import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 import {
   Bell,
-  BookOpen,
   ChevronRight,
-  Hammer,
-  Home,
   LayoutDashboard,
   LogOut,
-  Menu,
-  Receipt,
-  Settings,
   User,
-  Users,
-  Wrench,
   X,
 } from "lucide-react";
 import { IoMdCode } from "react-icons/io";
+import {
+  LuBadgePercent,
+  LuCalculator,
+  LuNetwork,
+  LuSettings2,
+  LuTelescope,
+  LuUserRoundCog,
+} from "react-icons/lu";
+import { FiHome } from "react-icons/fi";
 
 type AdminShellProps = {
   children: ReactNode;
@@ -31,21 +32,25 @@ const sidebarSections = [
     label: "Main",
     items: [
       { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-      { label: "User Management", href: "/admin/user-management", icon: Users },
+      {
+        label: "User Management",
+        href: "/admin/user-management",
+        icon: LuUserRoundCog,
+      },
       {
         label: "Property Management",
         href: "/admin/property-management",
-        icon: Home,
+        icon: FiHome,
       },
       {
         label: "Service Management",
         href: "/admin/service-management",
-        icon: Wrench,
+        icon: LuNetwork,
       },
       {
         label: "Blog Management",
         href: "/admin/blog-management",
-        icon: BookOpen,
+        icon: LuTelescope,
       },
     ],
   },
@@ -55,14 +60,13 @@ const sidebarSections = [
       {
         label: "Property Valuation",
         href: "/admin/property-valuation",
-        icon: Receipt,
+        icon: LuCalculator,
       },
       {
         label: "Tax Calculation",
         href: "/admin/tax-calculation",
-        icon: Receipt,
+        icon: LuBadgePercent,
       },
-      { label: "Maintenance", href: "/admin/maintenance", icon: Hammer },
     ],
   },
   {
@@ -72,7 +76,7 @@ const sidebarSections = [
       {
         label: "Settings",
         href: "/admin/settings",
-        icon: Settings,
+        icon: LuSettings2,
         hasArrow: true,
       },
     ],
@@ -102,7 +106,7 @@ export default function AdminShell({ children }: AdminShellProps) {
             <div key={section.label}>
               {/* Section label when expanded */}
               {isExpanded ? (
-                <p className='px-3 mb-1 text-[11px] font-semibold text-gray-400 uppercase tracking-widest'>
+                <p className='px-3 mb-1 text-[13px] font-semibold text-[#70706C] tracking-widest'>
                   {section.label}
                 </p>
               ) : (
@@ -124,17 +128,17 @@ export default function AdminShell({ children }: AdminShellProps) {
                       }}
                       className={`flex items-center rounded-md px-3 py-2 text-sm transition-colors ${
                         isActive
-                          ? "bg-[#EEF5F2] text-(--primary)"
-                          : "text-(--primary-text-color) hover:bg-gray-100"
+                          ? "bg-[#F8FAF9] text-black"
+                          : " hover:bg-gray-100 text-[#70706C]"
                       } ${
                         !isExpanded
                           ? "justify-center px-2"
                           : "justify-between gap-3"
                       }`}>
                       <div className='flex items-center gap-3 min-w-0'>
-                        <Icon size={18} className='shrink-0' />
+                        <Icon size={18} className='shrink-0 text-black' />
                         {isExpanded && (
-                          <span className='truncate text-[14px]'>
+                          <span className='truncate text-[14px] '>
                             {item.label}
                           </span>
                         )}
@@ -167,8 +171,8 @@ export default function AdminShell({ children }: AdminShellProps) {
   };
 
   return (
-    <div className='min-h-screen bg-[#F8F8F8]'>
-      {/* ── STICKY HEADER (full width, split into sidebar-mirror + topnav) ── */}
+    <div className='min-h-screen'>
+      {/* ── STICKY HEADER ── */}
       <header className='sticky top-0 z-50 h-20 border-b border-[#D1CEC6] bg-white flex'>
         {/* Left cell — same width as sidebar, collapses with it */}
         <div
@@ -177,7 +181,7 @@ export default function AdminShell({ children }: AdminShellProps) {
           }`}>
           {isDesktopSidebarOpen ? (
             <>
-              <Link href='/admin' className='flex items-center flex-1 min-w-0'>
+              <Link href='/' className='flex items-center flex-1 min-w-0'>
                 <Image
                   src='/logo.png'
                   alt='Farrior Homes'
@@ -207,21 +211,21 @@ export default function AdminShell({ children }: AdminShellProps) {
         <div className='flex-1 flex items-center justify-between px-4 md:px-6 lg:px-8'>
           {/* Mobile: hamburger + logo */}
           <div className='flex items-center gap-3 md:hidden'>
-            <button
-              onClick={() => setIsMobileSidebarOpen(true)}
-              aria-label='Open sidebar'
-              className='text-gray-700'>
-              <Menu size={24} />
-            </button>
-            <Link href='/admin' className='flex items-center'>
+            <Link href='/' className='flex items-center'>
               <Image
                 src='/logo.png'
                 alt='Farrior Homes'
                 width={140}
                 height={50}
-                className='h-9 w-auto object-contain'
+                className='h-12 w-auto object-contain'
               />
             </Link>
+            <button
+              onClick={() => setIsMobileSidebarOpen(true)}
+              aria-label='Open sidebar'
+              className='text-gray-700'>
+              <IoMdCode size={20} />
+            </button>
           </div>
 
           {/* Desktop: empty left so icons stay right */}
@@ -243,7 +247,7 @@ export default function AdminShell({ children }: AdminShellProps) {
         </div>
       </header>
 
-      {/* ── BODY: sidebar + main content ── */}
+      {/* ──  sidebar + main content ── */}
       <div className='flex'>
         {/* Desktop Sidebar */}
         <aside
@@ -254,7 +258,7 @@ export default function AdminShell({ children }: AdminShellProps) {
         </aside>
 
         {/* Page content */}
-        <main className='flex-1 p-4 md:p-6 lg:p-8 min-w-0'>{children}</main>
+        <main className='flex-1 p-4 md:p-11 min-w-0'>{children}</main>
       </div>
 
       {/* ── MOBILE SIDEBAR OVERLAY ── */}

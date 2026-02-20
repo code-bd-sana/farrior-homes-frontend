@@ -21,12 +21,8 @@ export default function ViewButton({
       <button
         type='button'
         onClick={() => router.push(href)}
-        className={` px-6 py-3 bg-(--primary) text-xl text-white rounded-lg hover:bg-(--primary-hover) transition-colors duration-300 cursor-pointer  ${className}`}>
-        {icon && (
-          <span className='mr-2 '>
-            {icon}
-          </span>
-        )}
+        className={` px-6 py-2.5 bg-(--primary) text-xl text-white rounded-lg hover:bg-(--primary-hover) transition-colors duration-300 cursor-pointer  ${className}`}>
+        {icon && <span className='mr-2 '>{icon}</span>}
         {label}
       </button>
     </div>

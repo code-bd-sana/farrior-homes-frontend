@@ -1,4 +1,4 @@
-import UserManagement from "@/components/admin/table/UserManagement";
+import UserManagement from "@/components/admin/UserManagementTable/UserManagement";
 import React from "react";
 
 const page = () => {
