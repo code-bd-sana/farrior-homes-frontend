@@ -307,7 +307,7 @@ export default function UserShell({ children }: UserShellProps) {
         </aside>
 
         <main className='md:col-span-9 min-w-0'>
-          <div className='p-4 md:p-6'>{children}</div>
+          <div className=''>{children}</div>
         </main>
       </div>
 

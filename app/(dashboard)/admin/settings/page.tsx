@@ -1,8 +1,8 @@
 import NotificationPage from "@/components/shared/NotificationPage/NotificationPage";
 
-export default function UserProfileSettingsPage() {
+export default function page() {
   return (
-    <div className='border border-[#D1CEC6] rounded-lg p-4 md:p-6'>
+    <div>
       <NotificationPage />
     </div>
   );
