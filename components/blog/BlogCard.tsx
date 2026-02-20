@@ -8,7 +8,7 @@ interface BlogCardProps {
   variant?: "vertical" | "horizontal";
 }
 
-const BlogCard: React.FC<BlogCardProps> = ({ blog, variant = "vertical" }) => {
+const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
   return (
     <div className=''>
       <Card
