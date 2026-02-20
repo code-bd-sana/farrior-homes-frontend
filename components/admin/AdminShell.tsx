@@ -107,7 +107,9 @@ export default function AdminShell({ children }: AdminShellProps) {
   const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [currentHash, setCurrentHash] = useState("");
-  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(
+    {},
+  );
 
   const toggleExpanded = (href: string) => {
     setExpandedItems((prev) => {
@@ -235,7 +237,8 @@ export default function AdminShell({ children }: AdminShellProps) {
                           {item.children?.map((child) => {
                             const hrefWithHash = `${item.href}${child.hash}`;
                             const isHashActive =
-                              pathname === item.href && currentHash === child.hash;
+                              pathname === item.href &&
+                              currentHash === child.hash;
 
                             return (
                               <Link
