@@ -57,7 +57,7 @@ export default function SubscriptionContent() {
         {subscriptionData.map((subscription, index) => (
           <div
             key={index}
-            className=' mb-8 p-4 md:p-6 border border-(--primary) hover:bg-[#F8FAF9] rounded-lg shadow-sm transition-colors duration-200 '>
+            className=' mb-8 p-4 md:p-6 border border-[#D1E3D9] hover:bg-[#F8FAF9] hover:border-(--primary) rounded-lg shadow-sm transition-colors duration-200 '>
             <h2 className='text-2xl '>{subscription.plan}</h2>
             <p className='text-xs mb-3'>{subscription.type}</p>
 
