@@ -1,9 +1,9 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import UserManagement from "../admin/UserManagementTable/UserManagement";
 import TestTablePage from "../table/testTable";
 import SubscriptionContent from "./subscription/SubscriptionContent";
-import UserManagement from "../admin/UserManagementTable/UserManagement";
 
 export default function DashboardLContent() {
   const pathname = usePathname();
