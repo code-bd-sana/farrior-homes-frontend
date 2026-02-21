@@ -1,9 +1,14 @@
 "use client";
 
+import { ChevronDown, ChevronUp, FileText, LogOut, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useEffect, useMemo, useState } from "react";
-import { ChevronDown, ChevronUp, FileText, LogOut, X } from "lucide-react";
+import { BiHomeAlt } from "react-icons/bi";
+import { CgCalculator } from "react-icons/cg";
+import { FaRegBookmark } from "react-icons/fa6";
+import { FiCreditCard } from "react-icons/fi";
+import { GrSettingsOption } from "react-icons/gr";
 import {
   LuBadgePercent,
   LuBuilding2,
@@ -11,11 +16,6 @@ import {
   LuSettings2,
   LuUserRound,
 } from "react-icons/lu";
-import { BiHomeAlt } from "react-icons/bi";
-import { FaRegBookmark } from "react-icons/fa6";
-import { CgCalculator } from "react-icons/cg";
-import { GrSettingsOption } from "react-icons/gr";
-import { FiCreditCard } from "react-icons/fi";
 import { MdOutlineDashboard } from "react-icons/md";
 
 type UserShellProps = {
@@ -307,9 +307,7 @@ export default function UserShell({ children }: UserShellProps) {
         </aside>
 
         <main className='md:col-span-9 min-w-0'>
-          <div className='border border-[#D1CEC6] rounded-lg p-4 md:p-6'>
-            {children}
-          </div>
+          <div className='rounded-lg p-4 md:p-6'>{children}</div>
         </main>
       </div>
 
