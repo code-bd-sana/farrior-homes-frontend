@@ -4,15 +4,18 @@ import Card from "@/components/shared/Card/Card";
 import { Bath, Bed, Plus, Square } from "lucide-react";
 
 import properties from "@/lib/propertyData";
+import Link from "next/link";
 
 const page = () => {
   return (
     <div>
       <div className='flex justify-between mb-5'>
         <h1 className='text-[36px]'>Own Property</h1>
-        <button className='flex justify-center items-center text-white w-[154px] h-[36px] p-2 rounded-sm cursor-pointer bg-[#619B7F]'>
-          <Plus size={16} /> Add Property
-        </button>
+        <Link href='/dashboard/main/add-property'>
+          <button className='flex justify-center items-center text-white w-[154px] h-[36px] p-2 rounded-sm cursor-pointer bg-[#619B7F]'>
+            <Plus size={16} /> Add Property
+          </button>
+        </Link>
       </div>
 
       <div>
