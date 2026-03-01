@@ -8,9 +8,9 @@ export default function UserMessagePage() {
 
       <div className='flex space-x-6'>
         {/* Profile Section */}
-        <div className='flex-shrink-0'>
+        <div className='shrink-0'>
           <Image
-            src='/path/to/profile-image.jpg' // replace with actual image path
+            src='/path/to/profile-image.jpg'
             alt='User Profile'
             width={60}
             height={60}

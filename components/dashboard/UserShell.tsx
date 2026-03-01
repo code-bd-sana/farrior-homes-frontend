@@ -4,6 +4,7 @@ import { ChevronDown, ChevronUp, FileText, LogOut, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useEffect, useMemo, useState } from "react";
+import { logoutAction } from "@/actions/auth.action";
 import { BiHomeAlt } from "react-icons/bi";
 import { CgCalculator } from "react-icons/cg";
 import { FaRegBookmark } from "react-icons/fa6";
@@ -51,6 +52,27 @@ export default function UserShell({ children }: UserShellProps) {
       window.removeEventListener("hashchange", updateHash);
     };
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const hash = window.location.hash || "";
+
+    // Defer state update to avoid synchronous setState inside effect
+    // which can cause cascading renders.
+    setTimeout(() => setCurrentHash(hash), 0);
+
+    if (hash && pathname === "/dashboard/profile") {
+      const id = hash.replace("#", "");
+      const el = document.getElementById(id);
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+          window.dispatchEvent(new HashChangeEvent("hashchange"));
+        }, 0);
+      }
+    }
+  }, [pathname]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -164,9 +186,12 @@ export default function UserShell({ children }: UserShellProps) {
     ];
   }, [dashboardPlan, profileOverviewSection]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logoutAction();
+
     try {
       localStorage.setItem("isLoggedIn", "false");
+      localStorage.removeItem("userRole");
     } catch {}
     router.push("/");
   };
