@@ -17,6 +17,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FiBookmark, FiGrid, FiHome, FiSettings } from "react-icons/fi";
+import { logoutAction } from "@/actions/auth.action";
 
 export default function DashboardSidebar() {
   const [showProfileOverview, setShowProfileOverview] = useState(false);
@@ -293,9 +294,12 @@ export default function DashboardSidebar() {
 
       <div className='mt-6 border-t border-[#D1CEC6]'>
         <button
-          onClick={() => {
+          onClick={async () => {
+            await logoutAction();
+
             try {
               localStorage.setItem("isLoggedIn", "false");
+              localStorage.removeItem("userRole");
             } catch {}
             window.location.href = "/";
           }}
