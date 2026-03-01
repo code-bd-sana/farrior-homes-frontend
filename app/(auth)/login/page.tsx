@@ -28,6 +28,14 @@ export default function LoginPage() {
         email,
         password,
       });
+
+      if (!response.success || !response.data?.accessToken) {
+        setErrorMessage(response.message || "Login failed. Please try again.");
+        localStorage.setItem("isLoggedIn", "false");
+        localStorage.removeItem("userRole");
+        return;
+      }
+
       const authData = response.data;
       const normalizedRole =
         String(authData.user?.role ?? "user").toLowerCase() === "admin"
