@@ -55,6 +55,11 @@ export default function SignupPage() {
 
       const response = await registerAction(payload);
 
+      if (!response.success) {
+        setErrorMessage(response.message || "Registration failed.");
+        return;
+      }
+
       setSuccessMessage(response.message || "Registration successful.");
       setTimeout(() => {
         router.push("/login");
