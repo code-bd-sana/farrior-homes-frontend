@@ -28,8 +28,6 @@ export default function LoginPage() {
         email,
         password,
       });
-
-      console.log(response);
       const authData = response.data;
       const normalizedRole =
         String(authData.user?.role ?? "user").toLowerCase() === "admin"
