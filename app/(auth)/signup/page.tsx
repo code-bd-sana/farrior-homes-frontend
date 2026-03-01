@@ -2,22 +2,77 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, SubmitEvent } from "react";
+import { useRouter } from "next/navigation";
 import { AiOutlineUser } from "react-icons/ai";
 import { FiPhone } from "react-icons/fi";
 import { LuEye, LuEyeOff, LuLock } from "react-icons/lu";
 import { MdOutlineEmail } from "react-icons/md";
+import { registerAction, RegisterPayload } from "@/actions/auth.action";
+import { ArrowLeft } from "lucide-react";
 
 export default function SignupPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    if (!agreed) {
+      setErrorMessage("Please agree to the terms to continue.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setErrorMessage("Confirm password must match password.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const payload: RegisterPayload = {
+        name,
+        email,
+        phone,
+        password,
+        confirmPassword,
+      };
+
+      const response = await registerAction(payload);
+
+      setSuccessMessage(response.message || "Registration successful.");
+      setTimeout(() => {
+        router.push("/login");
+      }, 700);
+    } catch (error: unknown) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div
       className='
       min-h-screen w-full flex flex-col items-center justify-center
-      bg-linear-to-br from-white via-[#619B7F4D]  via-70% to-white
+      bg-linear-to-br from-white via-[#619B7F4D]  via-70% to-white py-12
     '>
       {/* Logo */}
       <div className='absolute top-6 left-6 flex items-center gap-2'>
@@ -32,7 +87,9 @@ export default function SignupPage() {
       </div>
 
       {/* Card */}
-      <div className='bg-white rounded-lg w-full max-w-md mx-4 px-8 py-8 border border-[#D1CEC6]'>
+      <form
+        onSubmit={handleSubmit}
+        className='bg-white rounded-lg w-full max-w-md mx-4 px-8 py-8 border border-[#D1CEC6]'>
         {/* Full Name */}
         <div className='mb-4'>
           <label className='block text-sm font-medium text-[#1B1B1A] mb-2'>
@@ -43,6 +100,10 @@ export default function SignupPage() {
             <input
               type='text'
               placeholder='Enter your full name'
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              required
+              autoComplete='name'
               className='flex-1 text-sm text-gray-500 placeholder-gray-400 outline-none bg-transparent'
             />
           </div>
@@ -58,6 +119,10 @@ export default function SignupPage() {
             <input
               type='email'
               placeholder='you@example.com'
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+              autoComplete='email'
               className='flex-1 text-sm text-gray-500 placeholder-gray-400 outline-none bg-transparent'
             />
           </div>
@@ -73,6 +138,10 @@ export default function SignupPage() {
             <input
               type='tel'
               placeholder='+880 1*** ******'
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
+              required
+              autoComplete='tel'
               className='flex-1 text-sm text-gray-500 placeholder-gray-400 outline-none bg-transparent'
             />
           </div>
@@ -88,6 +157,10 @@ export default function SignupPage() {
             <input
               type={showPassword ? "text" : "password"}
               placeholder='Enter your password'
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+              autoComplete='new-password'
               className='flex-1 text-sm text-gray-500 placeholder-gray-400 outline-none bg-transparent'
             />
             <button
@@ -113,6 +186,10 @@ export default function SignupPage() {
             <input
               type={showConfirmPassword ? "text" : "password"}
               placeholder='Enter your confirm password'
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              required
+              autoComplete='new-password'
               className='flex-1 text-sm text-gray-500 placeholder-gray-400 outline-none bg-transparent'
             />
             <button
@@ -149,9 +226,20 @@ export default function SignupPage() {
           </label>
         </div>
 
+        {errorMessage && (
+          <p className='mb-4 text-sm text-red-600'>{errorMessage}</p>
+        )}
+
+        {successMessage && (
+          <p className='mb-4 text-sm text-green-600'>{successMessage}</p>
+        )}
+
         {/* Sign Up Button */}
-        <button className='w-full px-6 py-2.5 bg-[#619B7F] text-xl text-white rounded-lg hover:bg-[#3a6a50] transition-colors duration-300 cursor-pointer'>
-          Sign up
+        <button
+          type='submit'
+          disabled={isSubmitting}
+          className='w-full px-6 py-2.5 bg-[#619B7F] text-xl text-white rounded-lg hover:bg-[#3a6a50] transition-colors duration-300 cursor-pointer disabled:cursor-not-allowed disabled:opacity-70'>
+          {isSubmitting ? "Signing up..." : "Sign up"}
         </button>
 
         {/* Divider */}
@@ -207,23 +295,14 @@ export default function SignupPage() {
             Sign in
           </Link>
         </p>
-      </div>
+      </form>
 
       {/* Back to home */}
-      <div className='mt-6 flex items-center gap-2 text-gray-600 text-sm cursor-pointer hover:text-gray-800 transition-colors'>
-        <svg
-          className='w-4 h-4'
-          fill='none'
-          viewBox='0 0 24 24'
-          stroke='currentColor'
-          strokeWidth={2}>
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            d='M10 19l-7-7m0 0l7-7m-7 7h18'
-          />
-        </svg>
-        Back to home
+      <div className='my-6 flex items-center gap-2 text-gray-600 text-sm cursor-pointer hover:text-gray-800 transition-colors'>
+        <ArrowLeft className='w-4 h-4' />
+        <Link href='/' className='hover:underline'>
+          Back to home
+        </Link>
       </div>
     </div>
   );

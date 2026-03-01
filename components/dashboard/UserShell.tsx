@@ -4,6 +4,7 @@ import { ChevronDown, ChevronUp, FileText, LogOut, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useEffect, useMemo, useState } from "react";
+import { logoutAction } from "@/actions/auth.action";
 import { BiHomeAlt } from "react-icons/bi";
 import { CgCalculator } from "react-icons/cg";
 import { FaRegBookmark } from "react-icons/fa6";
@@ -164,9 +165,12 @@ export default function UserShell({ children }: UserShellProps) {
     ];
   }, [dashboardPlan, profileOverviewSection]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logoutAction();
+
     try {
       localStorage.setItem("isLoggedIn", "false");
+      localStorage.removeItem("userRole");
     } catch {}
     router.push("/");
   };

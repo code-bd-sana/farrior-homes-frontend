@@ -2,13 +2,67 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { SubmitEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import { LuEye, LuEyeOff, LuLock } from "react-icons/lu";
 import { MdOutlineEmail } from "react-icons/md";
+import { loginAction } from "@/actions/auth.action";
+import { ArrowLeft } from "lucide-react";
 
-export default function SignupPage() {
+export default function LoginPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setErrorMessage("");
+    setIsSubmitting(true);
+
+    try {
+      const response = await loginAction({
+        email,
+        password,
+      });
+
+      const authData = response.data;
+      const normalizedRole =
+        String(authData.user?.role ?? "user").toLowerCase() === "admin"
+          ? "admin"
+          : "user";
+
+      localStorage.setItem("accessToken", authData.accessToken);
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userRole", normalizedRole);
+
+      if (agreed) {
+        localStorage.setItem("rememberMe", "true");
+      } else {
+        localStorage.removeItem("rememberMe");
+      }
+
+      if (normalizedRole === "admin") {
+        router.push("/admin");
+        return;
+      }
+
+      router.push("/dashboard/profile");
+    } catch (error: unknown) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again.",
+      );
+      localStorage.setItem("isLoggedIn", "false");
+      localStorage.removeItem("userRole");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div
@@ -29,7 +83,9 @@ export default function SignupPage() {
       </div>
 
       {/* Card */}
-      <div className='bg-white rounded-lg w-full max-w-md mx-4 px-8 py-8 border border-[#D1CEC6]'>
+      <form
+        onSubmit={handleSubmit}
+        className='bg-white rounded-lg w-full max-w-md mx-4 px-8 py-8 border border-[#D1CEC6]'>
         {/* Email Address */}
         <div className='mb-4'>
           <label className='block text-sm font-medium text-[#1B1B1A] mb-2'>
@@ -40,6 +96,10 @@ export default function SignupPage() {
             <input
               type='email'
               placeholder='you@example.com'
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+              autoComplete='email'
               className='flex-1 text-sm text-gray-500 placeholder-gray-400 outline-none bg-transparent'
             />
           </div>
@@ -55,6 +115,10 @@ export default function SignupPage() {
             <input
               type={showPassword ? "text" : "password"}
               placeholder='Enter your password'
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+              autoComplete='current-password'
               className='flex-1 text-sm text-gray-500 placeholder-gray-400 outline-none bg-transparent'
             />
             <button
@@ -69,6 +133,10 @@ export default function SignupPage() {
             </button>
           </div>
         </div>
+
+        {errorMessage && (
+          <p className='mb-4 text-sm text-red-600'>{errorMessage}</p>
+        )}
 
         {/* Terms */}
         <div className='flex justify-between items-center gap-2 mb-9'>
@@ -92,8 +160,11 @@ export default function SignupPage() {
         </div>
 
         {/* Log In Button */}
-        <button className='w-full px-6 py-2.5 bg-[#619B7F] text-xl text-white rounded-lg hover:bg-[#3a6a50] transition-colors duration-300 cursor-pointer'>
-          Log In
+        <button
+          type='submit'
+          disabled={isSubmitting}
+          className='w-full px-6 py-2.5 bg-[#619B7F] text-xl text-white rounded-lg hover:bg-[#3a6a50] transition-colors duration-300 cursor-pointer disabled:cursor-not-allowed disabled:opacity-70'>
+          {isSubmitting ? "Logging in..." : "Log In"}
         </button>
 
         {/* Divider */}
@@ -149,23 +220,14 @@ export default function SignupPage() {
             Sign up
           </Link>
         </p>
-      </div>
+      </form>
 
       {/* Back to home */}
       <div className='mt-6 flex items-center gap-2 text-gray-600 text-sm cursor-pointer hover:text-gray-800 transition-colors'>
-        <svg
-          className='w-4 h-4'
-          fill='none'
-          viewBox='0 0 24 24'
-          stroke='currentColor'
-          strokeWidth={2}>
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            d='M10 19l-7-7m0 0l7-7m-7 7h18'
-          />
-        </svg>
-        Back to home
+        <ArrowLeft className='w-4 h-4' />
+        <Link href='/' className='hover:underline'>
+          Back to home
+        </Link>
       </div>
     </div>
   );

@@ -14,6 +14,7 @@ import {
   User,
   X,
 } from "lucide-react";
+import { logoutAction } from "@/actions/auth.action";
 import { IoMdCode } from "react-icons/io";
 import {
   LuBadgePercent,
@@ -145,9 +146,12 @@ export default function AdminShell({ children }: AdminShellProps) {
     };
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logoutAction();
+
     try {
       localStorage.setItem("isLoggedIn", "false");
+      localStorage.removeItem("userRole");
     } catch {}
     router.push("/");
   };
