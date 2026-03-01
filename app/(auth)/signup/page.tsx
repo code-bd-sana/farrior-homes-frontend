@@ -11,6 +11,8 @@ import { MdOutlineEmail } from "react-icons/md";
 import { registerAction, RegisterPayload } from "@/actions/auth.action";
 import { ArrowLeft } from "lucide-react";
 
+// TODO: Need to ask if home & office address will be taken from the sign up page or not
+
 export default function SignupPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);

@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { apiFetch } from "@/lib/fetcher";
 import type { ApiResponse } from "@/lib/api";
+import type { UserProfile } from "@/types/user";
 
 // Register payload and response types
 export type RegisterPayload = {
@@ -29,13 +30,21 @@ export type LoginData = {
   };
 };
 
+// Current user data type returned from the /users/me endpoint
 type CurrentUserData = {
   role?: string;
 };
 
+// Authentication state for the navbar
 export type AuthNavbarState = {
   isLoggedIn: boolean;
   userRole: "user" | "admin";
+};
+
+export type AddAddressPayload = {
+  type: "home" | "office";
+  address?: string;
+  phone?: string;
 };
 
 /**
@@ -111,6 +120,62 @@ export async function getCurrentUserFromTokenAction(): Promise<AuthNavbarState> 
   }
 }
 
+/**
+ * Fetch the full user profile from the backend using the server cookie token.
+ * Returns `null` when the user is not authenticated or on error.
+ */
+export async function getUserProfileAction(): Promise<UserProfile | null> {
+  try {
+    const response = await apiFetch<ApiResponse<UserProfile>>("/users/me", {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    return response.data ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function addAddressAction(payload: AddAddressPayload) {
+  const body =
+    payload.type === "home"
+      ? {
+          homeAddress: payload.address?.trim() || "",
+          homePhone: payload.phone?.trim() || "",
+        }
+      : {
+          officeAddress: payload.address?.trim() || "",
+          officePhone: payload.phone?.trim() || "",
+        };
+
+  return apiFetch<ApiResponse<UserProfile>>("/users/me", {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+}
+
+export type UpdateProfilePayload = {
+  name?: string;
+  phone?: string;
+};
+
+/**
+ * Update user's profile fields (name, phone) using PATCH /users/me
+ */
+export async function updateProfileAction(payload: UpdateProfilePayload) {
+  return apiFetch<ApiResponse<UserProfile>>("/users/me", {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
+/**
+ * Logs out the current user by deleting the access token cookie.
+ *
+ * @returns A promise that resolves to an object indicating the success of the logout operation. The object contains a `success` property set to `true` if the logout was successful.
+ * @throws An error if there is an issue with deleting the access token cookie, which may occur due to server issues or other reasons related to cookie management. The error message will provide details about the failure.
+ */
 export async function logoutAction() {
   const cookieStore = await cookies();
   cookieStore.delete("accessToken");

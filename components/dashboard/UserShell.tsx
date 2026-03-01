@@ -56,6 +56,27 @@ export default function UserShell({ children }: UserShellProps) {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    const hash = window.location.hash || "";
+
+    // Defer state update to avoid synchronous setState inside effect
+    // which can cause cascading renders.
+    setTimeout(() => setCurrentHash(hash), 0);
+
+    if (hash && pathname === "/dashboard/profile") {
+      const id = hash.replace("#", "");
+      const el = document.getElementById(id);
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+          window.dispatchEvent(new HashChangeEvent("hashchange"));
+        }, 0);
+      }
+    }
+  }, [pathname]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const toggleSidebar = () => {
       setIsMobileSidebarOpen((prev) => !prev);
     };
