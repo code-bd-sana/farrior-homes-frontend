@@ -2,8 +2,22 @@
 
 import { cookies } from "next/headers";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000/api";
+function getApiBaseUrl(): string {
+  const configured =
+    process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL;
+
+  if (configured) {
+    return configured.replace(/\/+$/, "");
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    return "http://localhost:5000/api";
+  }
+
+  throw new Error(
+    "API base URL is missing. Set `API_BASE_URL` (preferred) or `NEXT_PUBLIC_API_BASE_URL` in Vercel.",
+  );
+}
 
 type ApiFetchOptions = RequestInit & {
   headers?: HeadersInit;
@@ -40,18 +54,26 @@ export async function apiFetch<T>(
   endpoint: string,
   options: ApiFetchOptions = {},
 ): Promise<T> {
+  const apiBaseUrl = getApiBaseUrl();
   const cookieStore = await cookies();
   const token = cookieStore.get("accessToken")?.value;
+  let response: Response;
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
-    },
-    cache: options.cache ?? "no-store",
-  });
+  try {
+    response = await fetch(`${apiBaseUrl}${endpoint}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(options.headers || {}),
+      },
+      cache: options.cache ?? "no-store",
+    });
+  } catch {
+    throw new Error(
+      "Unable to reach backend API. Verify backend deployment and API base URL environment variables.",
+    );
+  }
 
   const contentType = response.headers.get("content-type") || "";
   let payload: unknown;

@@ -55,10 +55,21 @@ export type AddAddressPayload = {
  * @throws An error if the registration request fails, with a message describing the issue.
  */
 export async function registerAction(payload: RegisterPayload) {
-  return apiFetch<ApiResponse<unknown>>("/auth/register", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
+  try {
+    return await apiFetch<ApiResponse<unknown>>("/auth/register", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Registration failed. Please try again.",
+      data: null,
+    } as ApiResponse<unknown>;
+  }
 }
 
 /**
@@ -68,26 +79,39 @@ export async function registerAction(payload: RegisterPayload) {
  * @returns A promise that resolves to the API response containing the success status, message, and any relevant data, such as the access token and user information.
  * @throws An error if the login request fails, with a message describing the issue. The error may occur due to invalid credentials, server issues, or other reasons related to the authentication process.
  */
-export async function loginAction(payload: LoginPayload) {
-  const response = await apiFetch<ApiResponse<LoginData>>("/auth/login", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
-
-  const token = response.data?.accessToken;
-
-  if (token) {
-    const cookieStore = await cookies();
-
-    cookieStore.set("accessToken", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
+export async function loginAction(
+  payload: LoginPayload,
+): Promise<ApiResponse<LoginData | null>> {
+  try {
+    const response = await apiFetch<ApiResponse<LoginData>>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(payload),
     });
-  }
 
-  return response;
+    const token = response.data?.accessToken;
+
+    if (token) {
+      const cookieStore = await cookies();
+
+      cookieStore.set("accessToken", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+      });
+    }
+
+    return response;
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Login failed. Please try again.",
+      data: null,
+    };
+  }
 }
 
 /**
