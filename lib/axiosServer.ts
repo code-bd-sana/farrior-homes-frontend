@@ -1,3 +1,4 @@
+import { config } from "@/config/config";
 import axios from "axios";
 import { cookies } from "next/headers";
 
@@ -6,7 +7,7 @@ export const axiosServer = async () => {
   const token = cookieStore.get("accessToken")?.value;
 
   const instance = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL,
+    baseURL: config.BASE_URL,
     withCredentials: true,
     headers: token
       ? {
