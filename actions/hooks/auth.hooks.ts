@@ -160,8 +160,6 @@ export const useLogoutMutation = (
   });
 };
 
-
-
 //   options?: UseMutationOptions<
 //     ApiResponse<UserProfile>,
 //     Error,
@@ -221,8 +219,8 @@ export const useUpdateProfileMutation = (
       queryClient.invalidateQueries({ queryKey: authKeys.navbarState });
     },
 
-    // Fixed: Accept context as unknown, then safely assert/type guard
-    onError: (err, variables, onMutateResult, context: unknown) => {
+    // Accept context as unknown, then safely assert/type guard
+    onError: (context: unknown) => {
       // Type guard / assertion – safe and clean
       if (
         context &&
