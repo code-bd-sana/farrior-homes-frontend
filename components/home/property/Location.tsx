@@ -1,3 +1,8 @@
+// components/home/property/Location.tsx
+"use client";
+
+import { useEffect, useState } from "react";
+
 export default function Location({
   address,
   lat,
@@ -7,19 +12,36 @@ export default function Location({
   lat?: number;
   lng?: number;
 }) {
-  const query = address ? encodeURIComponent(address) : `${lat},${lng}`;
-  const embedSrc = `https://www.google.com/maps?q=${query}&output=embed`;
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
+  const [mapUrl, setMapUrl] = useState("");
+
+  useEffect(() => {
+    if (address) {
+      const query = encodeURIComponent(address);
+      setMapUrl(`https://www.google.com/maps?q=${query}&output=embed`);
+    } else if (lat !== undefined && lng !== undefined) {
+      setMapUrl(`https://www.google.com/maps?q=${lat},${lng}&output=embed`);
+    }
+  }, [address, lat, lng]);
+
+  const mapsUrl = address 
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
+    : lat && lng 
+      ? `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
+      : "#";
+
+  if (!mapUrl) return null;
 
   return (
     <section className='w-full'>
-      <div className='overflow-hidden border border-gray-200 shadow-sm'>
-        <div className='relative w-full h-64 md:h-150 '>
+      <h2 className='text-xl font-semibold mb-4'>Location</h2>
+      <div className='overflow-hidden border border-gray-200 rounded-lg shadow-sm'>
+        <div className='relative w-full h-64 md:h-96'>
           <iframe
             title='property-location'
-            src={embedSrc}
+            src={mapUrl}
             className='w-full h-full block'
             loading='lazy'
+            allowFullScreen
           />
 
           {/* subtle pin in center + label */}
@@ -52,10 +74,8 @@ export default function Location({
         </div>
 
         <div className='p-4 bg-white'>
-          {address ? (
+          {address && (
             <div className='text-sm text-gray-700 mb-2'>{address}</div>
-          ) : (
-            <div className='text-sm text-gray-500 mb-2'>Coordinates</div>
           )}
 
           <div className='flex items-center justify-between'>
@@ -73,7 +93,7 @@ export default function Location({
               href={mapsUrl}
               target='_blank'
               rel='noopener noreferrer'
-              className='inline-flex items-center gap-2 text-sm text-(--primary) hover:underline'>
+              className='inline-flex items-center gap-2 text-sm text-[#619B7F] hover:underline'>
               Open in Google Maps
             </a>
           </div>
