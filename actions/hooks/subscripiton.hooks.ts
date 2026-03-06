@@ -1,19 +1,55 @@
 "use client";
 
-import { CreateSubscripiton } from "@/services/subscription";
+
+
+import { CreateSubscription } from "@/services/subscription";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+interface SubscriptionData {
+
+  id?: string;
+
+}
 
 export const useSubscriptionMutations = () => {
   const queryClient = useQueryClient();
 
-  // Create / Subscribe
-  const createMutation = useMutation({
-    mutationFn: CreateSubscripiton,
+  const createMutation = useMutation<any, Error, void>({
+    mutationFn: CreateSubscription,
+
     onSuccess: () => {
+      // Refetch subscriptions list
       queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
+    },
+
+    onError: (error) => {
+      console.error("Failed to create subscription:", error.message);
+    },
+
+
+    onSettled: () => {
+
     },
   });
 
+  return {
 
-  return { createMutation };
+    createMutation,
+    
+
+    createSubscription: createMutation.mutate,
+    createSubscriptionAsync: createMutation.mutateAsync,
+
+    // states
+    isLoading: createMutation.isPending,
+    isError: createMutation.isError,
+    isSuccess: createMutation.isSuccess,
+
+    // data & error
+    data: createMutation.data,
+    error: createMutation.error,
+
+    // utilities
+    reset: createMutation.reset,
+  };
 };
