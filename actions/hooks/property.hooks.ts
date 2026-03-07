@@ -1,11 +1,5 @@
 // actions/hooks/property.hooks.ts
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  UseQueryOptions,
-  UseMutationOptions,
-} from "@tanstack/react-query";
+import type { ApiResponse } from "@/lib/api";
 import axiosClient from "@/lib/axiosClient";
 import {
   createProperty,
@@ -14,8 +8,14 @@ import {
   PaginatedPropertiesResponse,
   PropertyStatus,
 } from "@/services/property";
-import type { ApiResponse } from "@/lib/api";
-import { getOwnProperties } from "@/services/property.server";
+import { getOwnProperties, getPropertyById } from "@/services/property.server";
+import {
+  useMutation,
+  UseMutationOptions,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from "@tanstack/react-query";
 
 // ============================================================================
 // Types
@@ -209,3 +209,18 @@ export const useProperty = () => {
     mutations: { create: createMutation, update: updateMutation, delete: deleteMutation },
   };
 };
+
+export const usePropertyById = (
+  id: string,
+  options?: Omit<
+    UseQueryOptions<ApiResponse<IPropertyResponse>>,
+    "queryKey" | "queryFn"
+  >
+) =>
+  useQuery<ApiResponse<IPropertyResponse>>({
+    queryKey: propertyKeys.detail(id),
+    queryFn: () => getPropertyById(id),
+    enabled: !!id, // prevent running if id missing
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    ...options,
+  });

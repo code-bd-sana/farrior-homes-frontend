@@ -39,3 +39,32 @@ export async function getOwnProperties(
     );
   }
 }
+
+/**
+ * Fetch single property by ID
+ */
+export async function getPropertyById(
+  propertyId: string
+): Promise<ApiResponse<IPropertyResponse>> {
+  try {
+    const response = await axiosClient.get<ApiResponse<IPropertyResponse>>(
+      `/property/${propertyId}`
+    );
+
+    return response.data;
+  } catch (error) {
+    const axiosError = error as AxiosError<ApiErrorResponse>;
+
+    const errorData = axiosError.response?.data as ApiErrorResponse | undefined;
+
+    console.error("Get property by id error:", {
+      message: axiosError.message,
+      response: errorData,
+      status: axiosError.response?.status,
+    });
+
+    throw new Error(
+      errorData?.message || axiosError.message || "Failed to fetch property."
+    );
+  }
+}
