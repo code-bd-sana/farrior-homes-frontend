@@ -1,8 +1,7 @@
-
-
 import { getUserClient, UsersResponse } from "@/services/user";
 import { getAllUsers } from "@/services/user";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { getUserById } from "@/services/user";
 
 /**
  * Hook for fetching the current user's profile information using the client-side axios instance.
@@ -44,5 +43,19 @@ export const useGetAllUsersAdmin = (
         hasPrevPage: false,
       },
     }),
+  });
+};
+
+/**
+ * Admin-only: get user by id
+ */
+export const useGetUserById = (id?: string) => {
+  return useQuery({
+    queryKey: ["admin-user", id],
+    queryFn: () =>
+      id ? getUserById(id) : Promise.reject("No user id provided"),
+    enabled: !!id,
+    staleTime: 60 * 1000,
+    retry: 1,
   });
 };
