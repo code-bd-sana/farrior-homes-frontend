@@ -3,12 +3,13 @@ import type { ApiResponse } from "@/lib/api";
 import axiosClient from "@/lib/axiosClient";
 import {
   createProperty,
+  getPropertyById,
   ICreateProperty,
   IPropertyResponse,
   PaginatedPropertiesResponse,
   PropertyStatus,
 } from "@/services/property";
-import { getOwnProperties, getPropertyById } from "@/services/property.server";
+import { getOwnProperties } from "@/services/property.server";
 import {
   useMutation,
   UseMutationOptions,

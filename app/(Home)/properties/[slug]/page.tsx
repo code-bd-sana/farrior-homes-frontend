@@ -7,15 +7,10 @@ import ViewButton from "@/components/shared/ViewButton/ViewButton";
 import { Bath, Bed, Heart, MapPin, MessageCircleMore, Square } from "lucide-react";
 import { useParams } from "next/navigation";
 
-type Props = {
-  params: { slug: string };
-};
-
-export default function Page({ params }: Props) {
-  const { slug } = useParams();
-  console.log(slug, 'slug re slug');
-  const { data, isLoading, isError, error } = usePropertyById(slug);
-  console.log(data, 'single property');
+export default function Page() {
+  const { slug: rawSlug } = useParams<{ slug: string }>();
+  const slug = Array.isArray(rawSlug) ? rawSlug[0] : rawSlug;
+  const { data, isLoading, isError, error } = usePropertyById(slug ?? "");
   const property = data?.data;
 
   const keyFeatures = property?.keyFeatures
@@ -40,11 +35,13 @@ export default function Page({ params }: Props) {
       ? property.thumbnail
       : property?.thumbnail?.image;
 
+  const propertyImages = ((property?.images ?? []) as Array<string | { image?: string }>)
+    .map((image) => (typeof image === "string" ? image : image?.image))
+    .filter((image): image is string => typeof image === "string" && image.length > 0);
+
   const galleryImages = [
     ...(thumbnailImage ? [thumbnailImage] : []),
-    ...((property?.images ?? []).filter(
-      (image): image is string => typeof image === "string" && image.length > 0
-    ) ?? []),
+    ...propertyImages,
   ].filter((image, index, arr) => arr.indexOf(image) === index);
 
   if (isLoading) return <div className='p-8'>Loading property...</div>;
