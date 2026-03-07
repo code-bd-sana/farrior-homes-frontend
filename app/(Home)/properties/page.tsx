@@ -7,6 +7,7 @@ import {
 import PropertyFilter, {
   PropertyFilters,
 } from "@/components/home/property/PropertyFilter";
+import Pagination from "@/components/pagination/Pagination";
 import Card from "@/components/shared/Card/Card";
 import { IPropertyResponse } from "@/services/property";
 import { Bath, Bed, Square } from "lucide-react";
@@ -40,7 +41,14 @@ const getMediaUrl = (item?: string | { image?: string } | null) => {
 
 export default function Properties() {
   const [filters, setFilters] = useState<PropertyFilters>(DEFAULT_FILTERS);
+  const [page, setPage] = useState(1);
   const debouncedFilters = useDebouncedValue(filters, 350);
+  const limit = 9;
+
+  const handleFilterChange = (nextFilters: PropertyFilters) => {
+    setFilters(nextFilters);
+    setPage(1);
+  };
 
   const queryParams = useMemo<PropertyListQuery>(() => {
     const type =
@@ -50,8 +58,8 @@ export default function Properties() {
         : undefined;
 
     return {
-      page: 1,
-      limit: 200,
+      page,
+      limit,
       minPrice: debouncedFilters.minPrice,
       maxPrice: debouncedFilters.maxPrice,
       type,
@@ -59,9 +67,10 @@ export default function Properties() {
       bedrooms: debouncedFilters.bedrooms,
       bathrooms: debouncedFilters.bathrooms,
     };
-  }, [debouncedFilters]);
+  }, [debouncedFilters, page]);
 
   const { data, isLoading, isError, error } = useProperties(queryParams);
+  const meta = data?.data?.meta;
 
   const properties = useMemo(() => {
     const serverProperties = data?.data?.data ?? [];
@@ -80,8 +89,11 @@ export default function Properties() {
       <div>
         <PropertyFilter
           value={filters}
-          onChange={setFilters}
-          onClear={() => setFilters(DEFAULT_FILTERS)}
+          onChange={handleFilterChange}
+          onClear={() => {
+            setFilters(DEFAULT_FILTERS);
+            setPage(1);
+          }}
         />
       </div>
 
@@ -97,36 +109,47 @@ export default function Properties() {
         ) : properties.length === 0 ? (
           <div className='p-8 border border-[#D1CEC6] rounded-md'>No properties found for selected filters.</div>
         ) : (
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {properties.map((property: IPropertyResponse) => {
-              const id = property._id ?? property.id;
-              const thumbnail = getMediaUrl(property.thumbnail) ?? "/property.png";
-              const statusLabel = property.status ?? property.propertyStatus ?? "For Sale";
+          <>
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
+              {properties.map((property: IPropertyResponse) => {
+                const id = property._id ?? property.id;
+                const thumbnail = getMediaUrl(property.thumbnail) ?? "/property.png";
+                const statusLabel = property.status ?? property.propertyStatus ?? "For Sale";
 
-              return (
-                <Card
-                  id={id}
-                  key={String(id)}
-                  imageUrl={thumbnail}
-                  badge={String(statusLabel)}
-                  title={property.propertyName}
-                  subtitle={property.address || property.overview}
-                  meta={[
-                    { label: "Beds", value: property.bedrooms, icon: Bed },
-                    { label: "Baths", value: property.bathrooms, icon: Bath },
-                    {
-                      label: "Sqft",
-                      value: property.squareFeet?.toLocaleString(),
-                      icon: Square,
-                    },
-                  ]}
-                  price={property.price}
-                  type='property'
-                  primaryActionLabel='View Details'
-                />
-              );
-            })}
-          </div>
+                return (
+                  <Card
+                    id={id}
+                    key={String(id)}
+                    imageUrl={thumbnail}
+                    badge={String(statusLabel)}
+                    title={property.propertyName}
+                    subtitle={property.address || property.overview}
+                    meta={[
+                      { label: "Beds", value: property.bedrooms, icon: Bed },
+                      { label: "Baths", value: property.bathrooms, icon: Bath },
+                      {
+                        label: "Sqft",
+                        value: property.squareFeet?.toLocaleString(),
+                        icon: Square,
+                      },
+                    ]}
+                    price={property.price}
+                    type='property'
+                    primaryActionLabel='View Details'
+                  />
+                );
+              })}
+            </div>
+            {meta && meta.totalPage > 1 && (
+              <Pagination
+                currentPage={meta.page}
+                totalPages={meta.totalPage}
+                total={meta.total}
+                perPage={meta.limit}
+                onPageChange={(nextPage) => setPage(nextPage)}
+              />
+            )}
+          </>
         )}
       </div>
     </div>
