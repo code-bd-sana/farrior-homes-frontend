@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import UserDetailsModal from "./UserDetailsModal";
 import Image from "next/image";
 import { useGetAllUsersAdmin } from "@/actions/hooks/user.hooks";
 import Pagination from "@/components/pagination/Pagination";
@@ -10,10 +10,10 @@ import { Loader2, Search } from "lucide-react";
 const PER_PAGE = 9;
 
 export default function UserManagement() {
-  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [modalUserId, setModalUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -193,9 +193,11 @@ export default function UserManagement() {
 
                   <td className='px-6 py-4 whitespace-nowrap text-right'>
                     <button
-                      onClick={() => router.push(`/users/${user.id}`)}
-                      className='text-sm text-[#1B1B1A] underline underline-offset-2 transition-colors'>
-                      View User
+                      onClick={() =>
+                        setModalUserId(user.id ? String(user.id) : "")
+                      }
+                      className='text-sm text-[#1B1B1A] underline underline-offset-2 transition-colors cursor-pointer hover:text-[#619B7F]'>
+                      View Details
                     </button>
                   </td>
                 </tr>
@@ -231,6 +233,12 @@ export default function UserManagement() {
           onPageChange={setCurrentPage}
         />
       </div>
+      {/* User Details Modal */}
+      <UserDetailsModal
+        userId={modalUserId || ""}
+        open={!!modalUserId}
+        onClose={() => setModalUserId(null)}
+      />
     </div>
   );
 }

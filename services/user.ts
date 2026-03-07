@@ -1,4 +1,4 @@
-'use server'
+"use server";
 import axiosClient from "@/lib/axiosClient";
 import { axiosServer } from "@/lib/axiosServer";
 import { AxiosError } from "axios";
@@ -54,28 +54,25 @@ export const getUserClient = async () => {
   return resp;
 };
 
-// /**
-//  * Get All Users as an Admin Only
-//  * This function is intended to be used by admin users to fetch a list of all registered users from the backend.
-//  *
-//  * @returns A promise that resolves to an array of user profiles.
-//  * @throws An error if the request fails, with details logged to the console for debugging.
-//  */
-
-
 //! initilize axios server!
 
 async function getAxiosInstance() {
   return await axiosServer();
 }
-//
 
+/**
+ * Get All Users as an Admin Only
+ * This function is intended to be used by admin users to fetch a list of all registered users from the backend.
+ *
+ * @returns A promise that resolves to an array of user profiles.
+ * @throws An error if the request fails, with details logged to the console for debugging.
+ */
 
 export const getAllUsers = async (
   params: GetAllUsersParams = {},
 ): Promise<UsersResponse> => {
   try {
-        const axiosInstance = await getAxiosInstance();
+    const axiosInstance = await getAxiosInstance();
     const { data } = await axiosInstance.get<{
       success: boolean;
       data: UsersResponse;
@@ -100,6 +97,33 @@ export const getAllUsers = async (
         (error.message === "Network Error"
           ? "Request blocked. Check backend CORS origin settings."
           : "Failed to load users list"),
+    );
+  }
+};
+
+/**
+ * Get a user by ID (admin only)
+ * @param id - User ID
+ * @returns User profile data
+ */
+export const getUserById = async (id: string) => {
+  try {
+    const axiosInstance = await getAxiosInstance();
+    const { data } = await axiosInstance.get<{
+      success: boolean;
+      data: AdminUser;
+    }>(`/users/${id}`);
+    if (!data.success || !data.data) {
+      throw new Error("Invalid response format from /users/:id");
+    }
+    return data.data;
+  } catch (err) {
+    const error = err as AxiosError<ApiErrorResponse>;
+    throw new Error(
+      error.response?.data?.message ||
+        (error.message === "Network Error"
+          ? "Request blocked. Check backend CORS origin settings."
+          : "Failed to load user details"),
     );
   }
 };
