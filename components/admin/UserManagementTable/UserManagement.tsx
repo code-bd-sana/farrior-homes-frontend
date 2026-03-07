@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import UserDetailsModal from "./UserDetailsModal";
 import Image from "next/image";
 import { useGetAllUsersAdmin } from "@/actions/hooks/user.hooks";
 import Pagination from "@/components/pagination/Pagination";
@@ -10,10 +10,10 @@ import { Loader2, Search } from "lucide-react";
 const PER_PAGE = 9;
 
 export default function UserManagement() {
-  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [modalUserId, setModalUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -65,17 +65,33 @@ export default function UserManagement() {
   }
 
   // Table rows
-  const tableRows = filteredUsers.map((user) => ({
-    id: user._id,
+  type TableRow = {
+    id: string;
+    image: string;
+    profileName: string;
+    email: string;
+    phone: string;
+    address: string;
+    subscription: boolean;
+    propertiesOwn: number;
+    propertiesBuy: number;
+    propertiesSell: number;
+  };
+
+  const tableRows: TableRow[] = filteredUsers.map((user) => ({
+    id: user._id ? String(user._id) : "",
     image: "/user.png",
     profileName: user.name || "Unknown",
     email: user.email || "N/A",
     phone: user.phone || "N/A",
     address: user.homeAddress || user.officeAddress || "N/A",
     subscription: user.isSubscribed ?? false,
-    propertiesOwn: 0,
-    propertiesBuy: 0,
-    propertiesSell: 0,
+    propertiesOwn:
+      typeof user.propertyOwnCount === "number" ? user.propertyOwnCount : 0,
+    propertiesBuy:
+      typeof user.propertyBuyCount === "number" ? user.propertyBuyCount : 0,
+    propertiesSell:
+      typeof user.propertySellCount === "number" ? user.propertySellCount : 0,
   }));
 
   return (
@@ -154,6 +170,7 @@ export default function UserManagement() {
                   <td className='px-6 py-4 whitespace-nowrap'>
                     <div className='w-10 h-10 rounded-full overflow-hidden bg-gray-100 border border-gray-200'>
                       <Image
+                        loading='eager'
                         src={user.image}
                         alt={user.profileName}
                         width={40}
@@ -193,9 +210,11 @@ export default function UserManagement() {
 
                   <td className='px-6 py-4 whitespace-nowrap text-right'>
                     <button
-                      onClick={() => router.push(`/users/${user.id}`)}
-                      className='text-sm text-[#1B1B1A] underline underline-offset-2 transition-colors'>
-                      View User
+                      onClick={() =>
+                        setModalUserId(user.id ? String(user.id) : "")
+                      }
+                      className='text-sm text-[#1B1B1A] underline underline-offset-2 transition-colors cursor-pointer hover:text-[#619B7F]'>
+                      View Details
                     </button>
                   </td>
                 </tr>
@@ -231,6 +250,12 @@ export default function UserManagement() {
           onPageChange={setCurrentPage}
         />
       </div>
+      {/* User Details Modal */}
+      <UserDetailsModal
+        userId={modalUserId || ""}
+        open={!!modalUserId}
+        onClose={() => setModalUserId(null)}
+      />
     </div>
   );
 }
