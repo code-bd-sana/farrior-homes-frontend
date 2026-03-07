@@ -62,7 +62,6 @@ export default function Properties() {
   }, [debouncedFilters]);
 
   const { data, isLoading, isError, error } = useProperties(queryParams);
-  console.log(data, 'data');
 
   const properties = useMemo(() => {
     const serverProperties = data?.data?.data ?? [];

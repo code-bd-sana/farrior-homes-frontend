@@ -31,6 +31,22 @@ export default function PropertyFilter({ value, onChange, onClear }: PropertyFil
   const [showBathrooms, setShowBathrooms] = useState(true);
   const [showMapSearch, setShowMapSearch] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [squareFeetSearch, setSquareFeetSearch] = useState("");
+
+  const baseSquareFeetOptions = [3000, 2400, 2000, 1800, 1500, 1200];
+  const mergedSquareFeetOptions = Array.from(
+    new Set([...baseSquareFeetOptions, ...value.squareFeet])
+  ).sort((a, b) => b - a);
+
+  const normalizedSquareFeetSearch = squareFeetSearch.replace(/\D/g, "");
+  const filteredSquareFeetOptions = normalizedSquareFeetSearch
+    ? mergedSquareFeetOptions.filter((size) =>
+        String(size).includes(normalizedSquareFeetSearch)
+      )
+    : mergedSquareFeetOptions;
+  const searchedSquareFeetValue = normalizedSquareFeetSearch
+    ? Number(normalizedSquareFeetSearch)
+    : null;
 
   const update = (patch: Partial<PropertyFilters>) => {
     onChange({ ...value, ...patch });
@@ -197,7 +213,29 @@ export default function PropertyFilter({ value, onChange, onClear }: PropertyFil
           </div>
           {showSquareFeet && (
             <div className='flex flex-col mt-2'>
-              {[3000, 2400, 2000, 1800, 1500, 1200].map((size) => (
+              <input
+                type='text'
+                value={squareFeetSearch}
+                onChange={(e) =>
+                  setSquareFeetSearch(e.target.value.replace(/\D/g, ""))
+                }
+                inputMode='numeric'
+                placeholder='Search sqft (numbers only)'
+                className='w-full border border-gray-300 rounded-md p-2 mb-3'
+              />
+              {searchedSquareFeetValue &&
+                searchedSquareFeetValue > 0 &&
+                !mergedSquareFeetOptions.includes(searchedSquareFeetValue) && (
+                  <button
+                    type='button'
+                    onClick={() =>
+                      toggleNumberFilter("squareFeet", searchedSquareFeetValue)
+                    }
+                    className='text-left text-sm mb-2 text-[#619B7F] hover:underline'>
+                    Add {searchedSquareFeetValue} sqft
+                  </button>
+                )}
+              {filteredSquareFeetOptions.map((size) => (
                 <label key={size} className='flex items-center space-x-2 mb-2'>
                   <input
                     type='checkbox'
@@ -208,6 +246,9 @@ export default function PropertyFilter({ value, onChange, onClear }: PropertyFil
                   <span>{size}</span>
                 </label>
               ))}
+              {filteredSquareFeetOptions.length === 0 && (
+                <p className='text-sm text-gray-500'>No square-feet option found</p>
+              )}
             </div>
           )}
         </div>
