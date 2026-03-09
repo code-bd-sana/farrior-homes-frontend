@@ -1,7 +1,13 @@
 'use client';
 
 import { useUserProfile } from "@/actions/hooks/auth.hooks";
-import { useDeletePropertyMutation, usePropertyById } from "@/actions/hooks/property.hooks";
+import {
+  useDeletePropertyMutation,
+  useIsPropertySaved,
+  usePropertyById,
+  useSavePropertyMutation,
+  useUnsavePropertyMutation,
+} from "@/actions/hooks/property.hooks";
 import Gallery from "@/components/home/property/Gallery";
 import Location from "@/components/home/property/Location";
 import ViewButton from "@/components/shared/ViewButton/ViewButton";
@@ -14,13 +20,44 @@ export default function Page() {
   const slug = Array.isArray(rawSlug) ? rawSlug[0] : rawSlug;
   const { data, isLoading, isError, error } = usePropertyById(slug ?? "");
   const { data: userProfile } = useUserProfile();
+  const property = data?.data;
+  const propertyId = String(property?._id ?? property?.id ?? "");
+  const currentUserId = String(
+    (userProfile as { _id?: string; id?: string | number } | null)?._id ??
+      userProfile?.id ??
+      "",
+  );
+  const propertyOwnerId = String(property?.propertyOwner ?? "");
+  const isOwner =
+    Boolean(currentUserId) &&
+    Boolean(propertyOwnerId) &&
+    currentUserId === propertyOwnerId;
+
+  const {
+    data: isSavedResponse,
+    refetch: refetchSavedState,
+  } = useIsPropertySaved(propertyId, {
+    enabled: Boolean(propertyId) && Boolean(currentUserId) && !isOwner,
+  });
+  const isSaved = Boolean(isSavedResponse?.data?.isSaved);
+
+  const savePropertyMutation = useSavePropertyMutation({
+    onSuccess: () => {
+      void refetchSavedState();
+    },
+  });
+  const unsavePropertyMutation = useUnsavePropertyMutation({
+    onSuccess: () => {
+      void refetchSavedState();
+    },
+  });
+
   const deletePropertyMutation = useDeletePropertyMutation({
     onSuccess: () => {
       router.push("/dashboard/main/own-property");
       router.refresh();
     },
   });
-  const property = data?.data;
 
   const keyFeatures = property?.keyFeatures
     ? property.keyFeatures
@@ -59,18 +96,27 @@ export default function Page() {
   }
   if (!property) return <div className='p-8'>Property not found</div>;
 
-  const currentUserId = String((userProfile as { _id?: string; id?: string | number } | null)?._id ?? userProfile?.id ?? "");
-  const propertyOwnerId = String(property.propertyOwner ?? "");
-  const isOwner = Boolean(currentUserId) && Boolean(propertyOwnerId) && currentUserId === propertyOwnerId;
-
   const handleDelete = () => {
-    const propertyId = String(property._id ?? property.id ?? "");
     if (!propertyId || deletePropertyMutation.isPending) return;
 
     const isConfirmed = window.confirm("Are you sure you want to delete this property?");
     if (!isConfirmed) return;
 
     deletePropertyMutation.mutate(propertyId);
+  };
+
+  const handleToggleSave = () => {
+    if (!propertyId) return;
+    if (!currentUserId) {
+      router.push("/login");
+      return;
+    }
+    if (savePropertyMutation.isPending || unsavePropertyMutation.isPending) return;
+    if (isSaved) {
+      unsavePropertyMutation.mutate(propertyId);
+    } else {
+      savePropertyMutation.mutate(propertyId);
+    }
   };
 
   return (
@@ -182,9 +228,19 @@ export default function Page() {
                         href='/message'
                         className='flex flex-row items-center justify-center'
                       />
-                      <div className='border border-[#D1CEC6] rounded-lg p-3'>
-                        <Heart className='text-(--primary)' />
-                      </div>
+                      <button
+                        type='button'
+                        onClick={handleToggleSave}
+                        disabled={
+                          savePropertyMutation.isPending ||
+                          unsavePropertyMutation.isPending
+                        }
+                        className='border border-[#D1CEC6] rounded-lg p-3 disabled:opacity-50 disabled:cursor-not-allowed'
+                        aria-label={isSaved ? "Unsave property" : "Save property"}>
+                        <Heart
+                          className={isSaved ? "fill-red-500 text-red-500" : "text-(--primary)"}
+                        />
+                      </button>
                     </div>
                   )}
                 </div>

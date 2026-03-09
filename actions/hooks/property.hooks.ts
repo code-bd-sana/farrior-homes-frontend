@@ -2,13 +2,18 @@
 import type { ApiResponse } from "@/lib/api";
 import axiosClient from "@/lib/axiosClient";
 import {
+  checkPropertySaved,
   createProperty,
+  getSavedProperties,
   getPropertyById,
   ICreateProperty,
   IPropertyResponse,
   Meta,
+  PaginatedSavedPropertiesResponse,
   PaginatedPropertiesResponse,
   PropertyStatus,
+  removeSavedPropertyById,
+  savePropertyById,
 } from "@/services/property";
 import { getAllProperties, getOwnProperties } from "@/services/property.server";
 import {
@@ -71,6 +76,11 @@ export const propertyKeys = {
   detail: (id: string) => [...propertyKeys.details(), id] as const,
   userProperties: (userId: string) =>
     [...propertyKeys.all, "user", userId] as const,
+  savedLists: () => [...propertyKeys.all, "saved-list"] as const,
+  savedList: (params?: { page?: number; limit?: number }) =>
+    [...propertyKeys.savedLists(), params ?? {}] as const,
+  savedStatus: (propertyId: string) =>
+    [...propertyKeys.all, "saved-status", propertyId] as const,
 };
 
 // ============================================================================
@@ -335,3 +345,76 @@ export const usePropertyById = (
     staleTime: 1000 * 60 * 5, // 5 minutes
     ...options,
   });
+
+export const useSavedProperties = (
+  params?: { page?: number; limit?: number },
+  options?: Omit<
+    UseQueryOptions<ApiResponse<PaginatedSavedPropertiesResponse>>,
+    "queryKey" | "queryFn"
+  >,
+) =>
+  useQuery<ApiResponse<PaginatedSavedPropertiesResponse>>({
+    queryKey: propertyKeys.savedList(params),
+    queryFn: () => getSavedProperties(params),
+    staleTime: 1000 * 60 * 2,
+    ...options,
+  });
+
+export const useIsPropertySaved = (
+  propertyId: string,
+  options?: Omit<
+    UseQueryOptions<ApiResponse<{ isSaved: boolean }>>,
+    "queryKey" | "queryFn"
+  >,
+) =>
+  useQuery<ApiResponse<{ isSaved: boolean }>>({
+    queryKey: propertyKeys.savedStatus(propertyId),
+    queryFn: () => checkPropertySaved(propertyId),
+    enabled: !!propertyId && (options?.enabled ?? true),
+    staleTime: 1000 * 30,
+    ...options,
+  });
+
+export const useSavePropertyMutation = (
+  options?: UseMutationOptions<ApiResponse<unknown>, Error, string>,
+) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (propertyId: string) => savePropertyById(propertyId),
+    onSuccess: (data, propertyId, context, mutation) => {
+      queryClient.invalidateQueries({ queryKey: propertyKeys.savedLists() });
+      queryClient.invalidateQueries({
+        queryKey: propertyKeys.savedStatus(propertyId),
+      });
+      if (options?.onSuccess)
+        options.onSuccess(data, propertyId, context, mutation);
+    },
+    onError: (error, variables, context, mutation) => {
+      if (options?.onError) options.onError(error, variables, context, mutation);
+    },
+    ...options,
+  });
+};
+
+export const useUnsavePropertyMutation = (
+  options?: UseMutationOptions<ApiResponse<unknown>, Error, string>,
+) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (propertyId: string) => removeSavedPropertyById(propertyId),
+    onSuccess: (data, propertyId, context, mutation) => {
+      queryClient.invalidateQueries({ queryKey: propertyKeys.savedLists() });
+      queryClient.invalidateQueries({
+        queryKey: propertyKeys.savedStatus(propertyId),
+      });
+      if (options?.onSuccess)
+        options.onSuccess(data, propertyId, context, mutation);
+    },
+    onError: (error, variables, context, mutation) => {
+      if (options?.onError) options.onError(error, variables, context, mutation);
+    },
+    ...options,
+  });
+};
