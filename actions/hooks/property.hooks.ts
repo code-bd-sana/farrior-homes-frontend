@@ -357,6 +357,8 @@ export const useSavedProperties = (
     queryKey: propertyKeys.savedList(params),
     queryFn: () => getSavedProperties(params),
     staleTime: 1000 * 60 * 2,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
     ...options,
   });
 
@@ -382,9 +384,12 @@ export const useSavePropertyMutation = (
 
   return useMutation({
     mutationFn: (propertyId: string) => savePropertyById(propertyId),
-    onSuccess: (data, propertyId, context, mutation) => {
-      queryClient.invalidateQueries({ queryKey: propertyKeys.savedLists() });
-      queryClient.invalidateQueries({
+    onSuccess: async (data, propertyId, context, mutation) => {
+      await queryClient.invalidateQueries({
+        queryKey: propertyKeys.savedLists(),
+        refetchType: "all",
+      });
+      await queryClient.invalidateQueries({
         queryKey: propertyKeys.savedStatus(propertyId),
       });
       if (options?.onSuccess)
@@ -404,9 +409,12 @@ export const useUnsavePropertyMutation = (
 
   return useMutation({
     mutationFn: (propertyId: string) => removeSavedPropertyById(propertyId),
-    onSuccess: (data, propertyId, context, mutation) => {
-      queryClient.invalidateQueries({ queryKey: propertyKeys.savedLists() });
-      queryClient.invalidateQueries({
+    onSuccess: async (data, propertyId, context, mutation) => {
+      await queryClient.invalidateQueries({
+        queryKey: propertyKeys.savedLists(),
+        refetchType: "all",
+      });
+      await queryClient.invalidateQueries({
         queryKey: propertyKeys.savedStatus(propertyId),
       });
       if (options?.onSuccess)
