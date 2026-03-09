@@ -39,7 +39,7 @@ const Page = () => {
                 ]}
                 price={p.price}
                 type="own-property"
-           primaryActionLabel={p.isPublished ? "View Details" : "Post Now"} // Use IsPosted instead of isPublished
+           primaryActionLabel={p.isPublished ? "View Details" : "Post For Sale"} // Use IsPosted instead of isPublished
               />
             ))}
         </div>
