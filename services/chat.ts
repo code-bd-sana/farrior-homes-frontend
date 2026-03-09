@@ -30,12 +30,21 @@ export type ChatConversation = {
   unreadCount: number;
 };
 
+export type ChatAttachment = {
+  key: string;
+  url: string;
+  mimeType: string;
+  size: number;
+  uploadedBy: string;
+  createdAt: string;
+};
+
 export type ChatMessage = {
   _id: string;
   conversationId: string;
   senderId: string;
   message: string;
-  attachments: string[];
+  attachments: ChatAttachment[];
   status: "sent" | "delivered" | "seen";
   unsentForEveryone: boolean;
   forwardedFrom?: string | null;
@@ -85,7 +94,7 @@ export const getChatMessages = async (params: {
 export const sendChatMessage = async (payload: {
   conversationId: string;
   message?: string;
-  attachments?: string[];
+  attachments?: ChatAttachment[];
 }): Promise<ApiResponse<ChatMessage>> => {
   const res = await axiosClient.post<ApiResponse<ChatMessage>>(
     "/chat/messages",
@@ -94,34 +103,7 @@ export const sendChatMessage = async (payload: {
   return res.data;
 };
 
-export const unsendChatMessage = async (
-  messageId: string,
-): Promise<ApiResponse<{ success: boolean }>> => {
-  const res = await axiosClient.patch<ApiResponse<{ success: boolean }>>(
-    `/chat/messages/${messageId}/unsend`,
-  );
-  return res.data;
-};
 
-export const deleteChatMessageForMe = async (
-  messageId: string,
-): Promise<ApiResponse<{ success: boolean }>> => {
-  const res = await axiosClient.patch<ApiResponse<{ success: boolean }>>(
-    `/chat/messages/${messageId}/delete-for-me`,
-  );
-  return res.data;
-};
-
-export const forwardChatMessage = async (
-  messageId: string,
-  targetConversationId: string,
-): Promise<ApiResponse<ChatMessage>> => {
-  const res = await axiosClient.post<ApiResponse<ChatMessage>>(
-    `/chat/messages/${messageId}/forward`,
-    { targetConversationId },
-  );
-  return res.data;
-};
 
 export const markChatSeen = async (
   conversationId: string,
@@ -135,10 +117,10 @@ export const markChatSeen = async (
 
 export const uploadChatFiles = async (
   files: File[],
-): Promise<ApiResponse<{ urls: string[] }>> => {
+): Promise<ApiResponse<{ urls: ChatAttachment[] }>> => {
   const formData = new FormData();
   files.forEach((file) => formData.append("files", file));
-  const res = await axiosClient.post<ApiResponse<{ urls: string[] }>>(
+  const res = await axiosClient.post<ApiResponse<{ urls: ChatAttachment[] }>>(
     "/chat/upload",
     formData,
     {

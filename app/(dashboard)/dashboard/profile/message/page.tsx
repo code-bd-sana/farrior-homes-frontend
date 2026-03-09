@@ -14,7 +14,7 @@ import {
 } from "@/actions/hooks/chat.hooks";
 import { useUserProfile } from "@/actions/hooks/auth.hooks";
 import { getChatSocket } from "@/lib/chatSocket";
-import type { ChatConversation, ChatMessage, PaginatedChatMessages } from "@/services/chat";
+import type { ChatConversation, ChatMessage, PaginatedChatMessages, ChatAttachment } from "@/services/chat";
 import type { ApiResponse } from "@/lib/api";
 import {
   FileText,
@@ -391,15 +391,15 @@ export default function UserMessagePage() {
     if (!resolvedActiveConversationId) return;
 
     const trimmed = messageText.trim();
-    let attachmentUrls: string[] = [];
+    let attachmentObjects: ChatAttachment[] = [];
 
     try {
       if (selectedFiles.length > 0) {
         const uploaded = await uploadFilesMutation.mutateAsync(selectedFiles);
-        attachmentUrls = uploaded.data.urls ?? [];
+        attachmentObjects = uploaded.data.urls ?? [];
       }
 
-      if (!trimmed && attachmentUrls.length === 0) return;
+      if (!trimmed && attachmentObjects.length === 0) return;
 
       const socket = socketRef.current;
 
@@ -407,13 +407,13 @@ export default function UserMessagePage() {
         socket.emit("sendMessage", {
           conversationId: resolvedActiveConversationId,
           message: trimmed,
-          attachments: attachmentUrls,
+          attachments: attachmentObjects,
         });
       } else {
         await sendMessageMutation.mutateAsync({
           conversationId: resolvedActiveConversationId,
           message: trimmed,
-          attachments: attachmentUrls,
+          attachments: attachmentObjects,
         });
       }
 
@@ -560,16 +560,16 @@ export default function UserMessagePage() {
                               ) : null}
                               {item.attachments?.length ? (
                                 <div className='mt-2 space-y-1'>
-                                  {item.attachments.map((url) => (
-                                    <div key={url}>
-                                      {isImageUrl(url) ? (
+                                  {item.attachments.map((attachment) => (
+                                    <div key={attachment.key || attachment.url}>
+                                      {isImageUrl(attachment.url) ? (
                                         <a
-                                          href={url}
+                                          href={attachment.url}
                                           target='_blank'
                                           rel='noreferrer'
                                           className='block overflow-hidden rounded-md border border-white/40'>
                                           <Image
-                                            src={url}
+                                            src={attachment.url}
                                             alt='Attachment image'
                                             width={220}
                                             height={140}
@@ -578,7 +578,7 @@ export default function UserMessagePage() {
                                         </a>
                                       ) : (
                                         <a
-                                          href={url}
+                                          href={attachment.url}
                                           target='_blank'
                                           rel='noreferrer'
                                           className='flex items-center gap-1 text-xs underline'>
