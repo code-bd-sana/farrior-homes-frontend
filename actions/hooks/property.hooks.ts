@@ -135,9 +135,11 @@ export const useUserOwnProperties = (
   >,
 ) =>
   useQuery<ApiResponse<PaginatedPropertiesResponse>>({
-    queryKey: ["properties", params],
+    queryKey: [...propertyKeys.userProperties("me"), params ?? {}],
     queryFn: () => getOwnProperties(params),
     staleTime: 1000 * 60 * 5,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
     ...options,
   });
 
@@ -200,10 +202,11 @@ export const useCreatePropertyMutation = (
 
   return useMutation({
     mutationFn: createProperty,
-    onSuccess: (data, variables, context, mutation) => {
+    onSuccess: async (data, variables, context, mutation) => {
       queryClient.invalidateQueries({ queryKey: propertyKeys.lists() });
-      queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: propertyKeys.userProperties("me"),
+        refetchType: "all",
       });
 
       if (options?.onSuccess)
@@ -246,11 +249,15 @@ export const useUpdatePropertyMutation = (
       });
       return res.data;
     },
-    onSuccess: (data, variables, context, mutation) => {
+    onSuccess: async (data, variables, context, mutation) => {
       queryClient.invalidateQueries({
         queryKey: propertyKeys.detail(variables.id),
       });
       queryClient.invalidateQueries({ queryKey: propertyKeys.lists() });
+      await queryClient.invalidateQueries({
+        queryKey: propertyKeys.userProperties("me"),
+        refetchType: "all",
+      });
 
       if (options?.onSuccess)
         options.onSuccess(data, variables, context, mutation);
@@ -274,9 +281,13 @@ export const useDeletePropertyMutation = (
       const res = await axiosClient.delete(`/property/${id}`);
       return res.data;
     },
-    onSuccess: (data, id, context, mutation) => {
+    onSuccess: async (data, id, context, mutation) => {
       queryClient.invalidateQueries({ queryKey: propertyKeys.lists() });
       queryClient.removeQueries({ queryKey: propertyKeys.detail(id) });
+      await queryClient.invalidateQueries({
+        queryKey: propertyKeys.userProperties("me"),
+        refetchType: "all",
+      });
 
       if (options?.onSuccess) options.onSuccess(data, id, context, mutation);
     },
