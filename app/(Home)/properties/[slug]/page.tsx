@@ -27,7 +27,12 @@ export default function Page() {
       userProfile?.id ??
       "",
   );
-  const propertyOwnerId = String(property?.propertyOwner ?? "");
+  const propertyOwnerId = String(
+    (property?.propertyOwner as { _id?: string; id?: string } | string | undefined)?._id ??
+      (property?.propertyOwner as { _id?: string; id?: string } | string | undefined)?.id ??
+      property?.propertyOwner ??
+      "",
+  );
   const isOwner =
     Boolean(currentUserId) &&
     Boolean(propertyOwnerId) &&
@@ -225,7 +230,11 @@ export default function Page() {
                       <ViewButton
                         icon={<MessageCircleMore className='h-5 w-5' />}
                         label='Message'
-                        href='/message'
+                        href={
+                          propertyOwnerId
+                            ? `/dashboard/profile/message?userId=${propertyOwnerId}&propertyId=${propertyId}`
+                            : "/dashboard/profile/message"
+                        }
                         className='flex flex-row items-center justify-center'
                       />
                       <button
