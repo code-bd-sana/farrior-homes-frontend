@@ -59,11 +59,19 @@ export type PaginatedChatMessages = {
   count: number;
 };
 
-export const getChatConversations = async (): Promise<
-  ApiResponse<ChatConversation[]>
-> => {
-  const res = await axiosClient.get<ApiResponse<ChatConversation[]>>(
+export type PaginatedChatConversations = {
+  conversations: ChatConversation[];
+  nextCursor: string | null;
+  hasMore: boolean;
+};
+
+export const getChatConversations = async (params?: {
+  cursor?: string;
+  limit?: number;
+}): Promise<ApiResponse<PaginatedChatConversations>> => {
+  const res = await axiosClient.get<ApiResponse<PaginatedChatConversations>>(
     "/chat/conversations",
+    { params },
   );
   return res.data;
 };

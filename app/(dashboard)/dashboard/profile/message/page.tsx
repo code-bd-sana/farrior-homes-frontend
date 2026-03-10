@@ -35,6 +35,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useCallback,
   type ChangeEvent,
 } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -88,6 +89,15 @@ export default function UserMessagePage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [forwardSourceMessageId, setForwardSourceMessageId] = useState("");
   const [openMessageMenuId, setOpenMessageMenuId] = useState("");
+  const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set());
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup typing timeout on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    };
+  }, []);
 
   const autoInitRef = useRef(false);
   const chatScopeKey = `${targetUserId}:${targetPropertyId}`;
@@ -103,14 +113,43 @@ export default function UserMessagePage() {
   );
 
   const {
-    data: conversationsResponse,
+    data: conversationsPages,
     error: conversationsQueryError,
     isLoading: conversationsLoading,
+    fetchNextPage: fetchNextConversationsPage,
+    hasNextPage: hasNextConversationsPage,
+    isFetchingNextPage: isFetchingNextConversationsPage,
   } = useChatConversations();
+
+  // Flatten all pages into a single list
   const conversations = useMemo(
-    () => conversationsResponse?.data ?? [],
-    [conversationsResponse?.data],
+    () =>
+      conversationsPages?.pages.flatMap(
+        (page) => page.data?.conversations ?? [],
+      ) ?? [],
+    [conversationsPages],
   );
+
+  // Sentinel ref for infinite scroll on the conversation list
+  const conversationSentinelRef = useRef<HTMLDivElement | null>(null);
+  const fetchNextConversations = useCallback(() => {
+    if (hasNextConversationsPage && !isFetchingNextConversationsPage) {
+      void fetchNextConversationsPage();
+    }
+  }, [fetchNextConversationsPage, hasNextConversationsPage, isFetchingNextConversationsPage]);
+
+  useEffect(() => {
+    const sentinel = conversationSentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) fetchNextConversations();
+      },
+      { threshold: 0.1 },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [fetchNextConversations]);
   const visibleConversations = useMemo(() => {
     const propertyScoped = conversations.filter((item) => Boolean(item.property?._id));
     if (!targetUserId || !targetPropertyId) return propertyScoped;
@@ -263,13 +302,10 @@ export default function UserMessagePage() {
       );
     };
 
-    const handleMessageDeletedForUser = (payload: {
+    const handleMessageDeletedForMe = (payload: {
       messageId: string;
       conversationId: string;
-      userId: string;
     }) => {
-      if (payload.userId !== myUserId) return;
-
       queryClient.setQueryData<ApiResponse<PaginatedChatMessages>>(
         chatKeys.messages(payload.conversationId),
         (previous) => {
@@ -280,6 +316,30 @@ export default function UserMessagePage() {
               ...previous.data,
               messages: previous.data.messages.filter(
                 (m) => m._id !== payload.messageId,
+              ),
+            },
+          };
+        },
+      );
+    };
+
+    const handleMessageUnsent = (payload: {
+      messageId: string;
+      conversationId: string;
+      userId: string;
+    }) => {
+      queryClient.setQueryData<ApiResponse<PaginatedChatMessages>>(
+        chatKeys.messages(payload.conversationId),
+        (previous) => {
+          if (!previous) return previous;
+          return {
+            ...previous,
+            data: {
+              ...previous.data,
+              messages: previous.data.messages.map((m) =>
+                m._id === payload.messageId
+                  ? { ...m, unsentForEveryone: true, message: "", attachments: [] }
+                  : m,
               ),
             },
           };
@@ -360,22 +420,56 @@ export default function UserMessagePage() {
       );
     };
 
+    const handleTypingStarted = (payload: {
+      conversationId: string;
+      userId: string;
+    }) => {
+      if (payload.userId === myUserId) return;
+      if (payload.conversationId === resolvedActiveConversationId) {
+        setTypingUsers((prev) => {
+          const next = new Set(prev);
+          next.add(payload.userId);
+          return next;
+        });
+      }
+    };
+
+    const handleTypingStopped = (payload: {
+      conversationId: string;
+      userId: string;
+    }) => {
+      if (payload.userId === myUserId) return;
+      if (payload.conversationId === resolvedActiveConversationId) {
+        setTypingUsers((prev) => {
+          const next = new Set(prev);
+          next.delete(payload.userId);
+          return next;
+        });
+      }
+    };
+
     socket.on("messageReceived", handleMessageReceived);
     socket.on("messageUpdated", handleMessageUpdated);
-    socket.on("messageDeletedForUser", handleMessageDeletedForUser);
+    socket.on("messageDeletedForMe", handleMessageDeletedForMe);
+    socket.on("messageUnsent", handleMessageUnsent);
     socket.on("conversationUpdated", handleConversationUpdated);
     socket.on("presenceUpdated", handlePresenceUpdated);
     socket.on("markedSeen", handleMarkedSeen);
+    socket.on("typingStarted", handleTypingStarted);
+    socket.on("typingStopped", handleTypingStopped);
 
     return () => {
       socket.off("messageReceived", handleMessageReceived);
       socket.off("messageUpdated", handleMessageUpdated);
-      socket.off("messageDeletedForUser", handleMessageDeletedForUser);
+      socket.off("messageDeletedForMe", handleMessageDeletedForMe);
+      socket.off("messageUnsent", handleMessageUnsent);
       socket.off("conversationUpdated", handleConversationUpdated);
       socket.off("presenceUpdated", handlePresenceUpdated);
       socket.off("markedSeen", handleMarkedSeen);
+      socket.off("typingStarted", handleTypingStarted);
+      socket.off("typingStopped", handleTypingStopped);
     };
-  }, [myUserId, queryClient]);
+  }, [myUserId, queryClient, resolvedActiveConversationId]);
 
   useEffect(() => {
     const socket = socketRef.current;
@@ -392,6 +486,12 @@ export default function UserMessagePage() {
 
     const trimmed = messageText.trim();
     let attachmentObjects: ChatAttachment[] = [];
+
+    // Stop typing immediately when sending message
+    if (socketRef.current?.connected) {
+      socketRef.current.emit("typingStopped", { conversationId: resolvedActiveConversationId });
+    }
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
 
     try {
       if (selectedFiles.length > 0) {
@@ -422,31 +522,74 @@ export default function UserMessagePage() {
       void refetchMessages();
     } catch (error) {
       console.error("Failed to send message/upload file", error);
+      alert("Failed to send your message. Please check your connection and try again.");
     }
   };
 
+  const handleTyping = (event: ChangeEvent<HTMLInputElement>) => {
+    setMessageText(event.target.value);
+
+    // Typing logic
+    if (socketRef.current?.connected && resolvedActiveConversationId) {
+      socketRef.current.emit("typingStarted", { conversationId: resolvedActiveConversationId });
+
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      
+      typingTimeoutRef.current = setTimeout(() => {
+        socketRef.current?.emit("typingStopped", { conversationId: resolvedActiveConversationId });
+      }, 2000); // 2 second timeout
+    }
+  };
+
+  const MAX_FILE_SIZE_MB = 50;
+  const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
   const onFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? []);
-    setSelectedFiles(files);
+    const oversized = files.filter((f) => f.size > MAX_FILE_SIZE_BYTES);
+    if (oversized.length > 0) {
+      alert(
+        `The following files exceed the ${MAX_FILE_SIZE_MB}MB limit and were not added:\n${oversized.map((f) => f.name).join("\n")}`,
+      );
+    }
+    setSelectedFiles(files.filter((f) => f.size <= MAX_FILE_SIZE_BYTES));
+    // Reset input so the same file can be re-selected after removal
+    event.target.value = "";
   };
 
   const handleUnsend = async (messageId: string) => {
+    const socket = socketRef.current;
     try {
-      await unsendMutation.mutateAsync({
-        messageId,
-        conversationId: resolvedActiveConversationId,
-      });
+      if (socket?.connected) {
+        socket.emit("unsendMessage", {
+          messageId,
+          conversationId: resolvedActiveConversationId,
+        });
+      } else {
+        await unsendMutation.mutateAsync({
+          messageId,
+          conversationId: resolvedActiveConversationId,
+        });
+      }
     } catch (error) {
       console.error("Failed to unsend message", error);
     }
   };
 
   const handleDeleteForMe = async (messageId: string) => {
+    const socket = socketRef.current;
     try {
-      await deleteForMeMutation.mutateAsync({
-        messageId,
-        conversationId: resolvedActiveConversationId,
-      });
+      if (socket?.connected) {
+        socket.emit("deleteForMe", {
+          messageId,
+          conversationId: resolvedActiveConversationId,
+        });
+      } else {
+        await deleteForMeMutation.mutateAsync({
+          messageId,
+          conversationId: resolvedActiveConversationId,
+        });
+      }
     } catch (error) {
       console.error("Failed to delete message for me", error);
     }
@@ -455,12 +598,19 @@ export default function UserMessagePage() {
   const handleForwardToConversation = async (targetConversationId: string) => {
     if (!forwardSourceMessageId) return;
 
+    const sourceMessage = messages.find((m) => m._id === forwardSourceMessageId);
+    if (!sourceMessage) return;
+
     const socket = socketRef.current;
     try {
       if (socket?.connected) {
-        socket.emit("forwardMessage", {
-          messageId: forwardSourceMessageId,
-          targetConversationId,
+        socket.emit("sendMessage", {
+          conversationId: targetConversationId,
+          message: sourceMessage.message ?? "",
+          attachments: sourceMessage.attachments ?? [],
+          isForwarded: true,
+          originalMessageId: forwardSourceMessageId,
+          forwardedBy: myUserId,
         });
       } else {
         await forwardMutation.mutateAsync({
@@ -696,6 +846,16 @@ export default function UserMessagePage() {
                 </div>
               </div>
             ) : null}
+            {typingUsers.size > 0 ? (
+              <div className='mt-2 flex items-center gap-1 p-2 text-xs italic text-[#6A6A66]'>
+                {otherParticipant?.name ?? "Someone"} is typing
+                <span className="flex gap-[2px] ml-1 h-1.5">
+                  <span className="w-1.5 h-1.5 bg-[#6A6A66] rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                  <span className="w-1.5 h-1.5 bg-[#6A6A66] rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                  <span className="w-1.5 h-1.5 bg-[#6A6A66] rounded-full animate-bounce"></span>
+                </span>
+              </div>
+            ) : null}
           </div>
 
           <div className='border-t border-[#D8DAD9] pt-3'>
@@ -723,9 +883,12 @@ export default function UserMessagePage() {
               </label>
               <input
                 value={messageText}
-                onChange={(event) => setMessageText(event.target.value)}
+                onChange={handleTyping}
                 placeholder='Type your message'
                 className='h-11 flex-1 rounded-md border border-[#C5CAC8] bg-[#EEF1F0] px-3 text-sm outline-none'
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSendMessage();
+                }}
               />
               <button
                 type='button'
@@ -829,7 +992,14 @@ export default function UserMessagePage() {
                 );
               })
             )}
+            {/* Infinite scroll sentinel — triggers next page load when visible */}
+            <div ref={conversationSentinelRef} className='py-1'>
+              {isFetchingNextConversationsPage ? (
+                <p className='text-center text-xs text-[#6A6A66]'>Loading more…</p>
+              ) : null}
+            </div>
           </div>
+
         </aside>
       </div>
       {forwardSourceMessageId ? (
