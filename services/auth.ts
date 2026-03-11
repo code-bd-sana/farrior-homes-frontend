@@ -177,7 +177,7 @@ export async function getCurrentUserFromTokenAction(): Promise<AuthNavbarState> 
     } else {
       isSubscribed = Boolean(isSubscribedRaw);
     }
-    console.log(response.data?.data, "logged subscribed");
+    // console.log(response.data?.data, "logged subscribed");
 
     return {
       isLoggedIn: true,
