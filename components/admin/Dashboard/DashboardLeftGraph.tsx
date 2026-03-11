@@ -1,14 +1,14 @@
 "use client";
 
 import { useAdminDashboardStats } from "@/actions/hooks/user.hooks";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
-  BarChart,
   Bar,
+  BarChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
 
 export default function DashboardLeftGraph() {
