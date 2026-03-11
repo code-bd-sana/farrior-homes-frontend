@@ -37,6 +37,7 @@ import {
   useState,
   useCallback,
   type ChangeEvent,
+  Suspense,
 } from "react";
 import { useQueryClient, type InfiniteData } from "@tanstack/react-query";
 import type { Socket } from "socket.io-client";
@@ -76,7 +77,7 @@ const isImageUrl = (url: string) =>
 
 const isImageFile = (file: File) => file.type.startsWith("image/");
 
-export default function UserMessagePage() {
+  function UserMessage() {
   const queryClient = useQueryClient();
   const socketRef = useRef<Socket | null>(null);
 
@@ -1095,3 +1096,16 @@ export default function UserMessagePage() {
     </div>
   );
 }
+
+
+import React from 'react';
+
+const UserMessagePage = () => {
+  return (
+   <Suspense fallback={<span>Loading.........</span>}>
+    <UserMessage/>
+   </Suspense>
+  );
+};
+
+export default UserMessagePage;

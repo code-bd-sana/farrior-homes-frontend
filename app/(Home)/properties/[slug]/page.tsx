@@ -14,6 +14,30 @@ import ViewButton from "@/components/shared/ViewButton/ViewButton";
 import { Bath, Bed, Heart, MapPin, MessageCircleMore, Pencil, Square, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 
+interface UserLike {
+  _id?: string;
+  id?: string;
+}
+
+interface PropertyOwnerLike {
+  _id?: string;
+  id?: string;
+}
+
+
+// Helper function to safely get property owner ID
+const getPropertyOwnerId = (propertyOwner: PropertyOwnerLike | string | number | undefined): string => {
+  if (!propertyOwner) return "";
+  
+  // If it's an object with _id or id
+  if (typeof propertyOwner === "object") {
+    return String(propertyOwner._id ?? propertyOwner.id ?? "");
+  }
+  
+  // If it's a string or number
+  return String(propertyOwner);
+};
+
 export default function Page() {
   const router = useRouter();
   const { slug: rawSlug } = useParams<{ slug: string }>();
@@ -22,17 +46,17 @@ export default function Page() {
   const { data: userProfile } = useUserProfile();
   const property = data?.data;
   const propertyId = String(property?._id ?? property?.id ?? "");
+  
+  // Safely get current user ID
   const currentUserId = String(
-    (userProfile as { _id?: string; id?: string | number } | null)?._id ??
-      userProfile?.id ??
-      "",
+    (userProfile && typeof userProfile === "object" 
+      ? (userProfile as UserLike)._id ?? (userProfile as UserLike).id ?? "" 
+      : "")
   );
-  const propertyOwnerId = String(
-    (property?.propertyOwner as { _id?: string; id?: string } | string | undefined)?._id ??
-      (property?.propertyOwner as { _id?: string; id?: string } | string | undefined)?.id ??
-      property?.propertyOwner ??
-      "",
-  );
+  
+  // Safely get property owner ID
+  const propertyOwnerId = getPropertyOwnerId(property?.propertyOwner);
+  
   const isOwner =
     Boolean(currentUserId) &&
     Boolean(propertyOwnerId) &&
