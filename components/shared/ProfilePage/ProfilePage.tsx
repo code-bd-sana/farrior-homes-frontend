@@ -23,6 +23,27 @@ type ProfilePageProps = {
   initialProfile?: UserProfile | null;
 };
 
+const getProfileImageUrl = (
+  profileImage:
+    | string
+    | {
+        key?: string;
+        image?: string;
+      }
+    | null
+    | undefined,
+): string => {
+  if (typeof profileImage === "string") {
+    return profileImage;
+  }
+
+  if (profileImage && typeof profileImage === "object") {
+    return profileImage.image || profileImage.key || "";
+  }
+
+  return "";
+};
+
 const ProfilePage: React.FC<ProfilePageProps> = ({ initialProfile }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedProfileImageFile, setSelectedProfileImageFile] =
@@ -229,7 +250,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ initialProfile }) => {
   const isLoading =
     updateProfileMutation.isPending || addAddressMutation.isPending;
   const isProfileSaving = updateProfileMutation.isPending;
-  const hasProfileImage = Boolean((profileData?.profileImage ?? "").trim());
+  const profileImageUrl = getProfileImageUrl(profileData?.profileImage);
+  console.log("Profile image:", profileImageUrl);
+  const hasProfileImage = Boolean(profileImageUrl.trim());
   const avatarText = (profileData?.name ?? "U").trim().charAt(0).toUpperCase();
 
   if (!profileData) {
@@ -298,7 +321,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ initialProfile }) => {
                     />
                   ) : hasProfileImage ? (
                     <Image
-                      src={profileData?.profileImage as string}
+                      src={profileImageUrl}
                       alt={profileData?.name ?? "Profile"}
                       width={500}
                       height={500}
