@@ -83,6 +83,27 @@ const isImageUrl = (url: string) =>
 
 const isImageFile = (file: File) => file.type.startsWith("image/");
 
+const getProfileImageUrl = (
+  profileImage:
+    | string
+    | {
+        key?: string;
+        image?: string;
+      }
+    | null
+    | undefined,
+): string => {
+  if (typeof profileImage === "string") {
+    return profileImage;
+  }
+
+  if (profileImage && typeof profileImage === "object") {
+    return profileImage.image || profileImage.key || "";
+  }
+
+  return "";
+};
+
 function UserMessage() {
   const queryClient = useQueryClient();
   const socketRef = useRef<Socket | null>(null);
@@ -564,6 +585,15 @@ function UserMessage() {
   }, [resolvedActiveConversationId]);
 
   const otherParticipant = getOtherParticipant(activeConversation, myUserId);
+  const otherParticipantProfileImageUrl = getProfileImageUrl(
+    otherParticipant?.profileImage as
+      | string
+      | {
+          key?: string;
+          image?: string;
+        }
+      | undefined,
+  );
 
   const handleSendMessage = async () => {
     if (!resolvedActiveConversationId) return;
@@ -723,7 +753,7 @@ function UserMessage() {
       markSeenMutation.mutate(resolvedActiveConversationId);
     }
   }, [resolvedActiveConversationId, messages.length, markSeenMutation]);
-
+  console.log(otherParticipant);
   return (
     // h-[calc(100vh-10rem)]
     <div className='w-full  min-h-170 rounded-lg border-2 border-[#D1CEC6] bg-[#F4F5F5] p-3 md:p-5'>
@@ -732,10 +762,10 @@ function UserMessage() {
           <div className='flex items-center justify-between border-b border-[#D8DAD9] px-2 pb-3'>
             <div className='flex items-center gap-3'>
               <div className='h-11 w-11 overflow-hidden rounded-full bg-[#D9DBDA]'>
-                {otherParticipant?.profileImage ? (
+                {otherParticipantProfileImageUrl ? (
                   <Image
-                    src={otherParticipant.profileImage}
-                    alt={otherParticipant.name ?? "User"}
+                    src={otherParticipantProfileImageUrl}
+                    alt={otherParticipant?.name ?? "User"}
                     width={44}
                     height={44}
                     className='h-full w-full object-cover'
@@ -1030,6 +1060,15 @@ function UserMessage() {
             ) : (
               visibleConversations.map((conversation) => {
                 const participant = getOtherParticipant(conversation, myUserId);
+                const participantProfileImageUrl = getProfileImageUrl(
+                  participant?.profileImage as
+                    | string
+                    | {
+                        key?: string;
+                        image?: string;
+                      }
+                    | undefined,
+                );
                 const isActive =
                   conversation._id === resolvedActiveConversationId;
 
@@ -1045,10 +1084,10 @@ function UserMessage() {
                     }`}>
                     <div className='flex items-center gap-2'>
                       <div className='relative h-9 w-9 overflow-hidden rounded-full bg-[#D9DBDA]'>
-                        {participant?.profileImage ? (
+                        {participantProfileImageUrl ? (
                           <Image
-                            src={participant.profileImage}
-                            alt={participant.name ?? "User"}
+                            src={participantProfileImageUrl}
+                            alt={participant?.name ?? "User"}
                             width={36}
                             height={36}
                             className='h-full w-full object-cover'
