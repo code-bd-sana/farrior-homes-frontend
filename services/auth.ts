@@ -51,7 +51,7 @@ export type AddAddressPayload = {
 export type UpdateProfilePayload = {
   name?: string;
   phone?: string;
-  profileImage?: File;
+  profileImage?: File | string;
   facebookLink?: string;
   instagramLink?: string;
   twitterLink?: string;

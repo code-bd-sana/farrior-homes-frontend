@@ -27,11 +27,43 @@ type ApiErrorResponse = {
   message?: string;
 };
 
+type ProfileImageValue =
+  | string
+  | {
+      key?: string;
+      image?: string;
+    }
+  | null
+  | undefined;
+
+const getProfileImageUrl = (profileImage: ProfileImageValue): string => {
+  if (typeof profileImage === "string") {
+    return profileImage;
+  }
+
+  if (profileImage && typeof profileImage === "object") {
+    return profileImage.image || profileImage.key || "";
+  }
+
+  return "";
+};
+
+const normalizeUserProfile = (
+  profile: UserProfile | null,
+): UserProfile | null => {
+  if (!profile) return null;
+
+  return {
+    ...profile,
+    profileImage: getProfileImageUrl(profile.profileImage as ProfileImageValue),
+  };
+};
+
 const getUserProfileClient = async (): Promise<UserProfile | null> => {
   try {
     const response =
       await axiosClient.get<ApiResponse<UserProfile>>("/users/me");
-    return response.data.data ?? null;
+    return normalizeUserProfile(response.data.data ?? null);
   } catch {
     return null;
   }
@@ -56,7 +88,11 @@ const addAddressClient = async (
       "/users/me",
       body,
     );
-    return response.data;
+
+    return {
+      ...response.data,
+      data: normalizeUserProfile(response.data.data) as UserProfile,
+    };
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
     throw new Error(
@@ -100,7 +136,10 @@ const updateProfileClient = async (
         },
       );
 
-      return response.data;
+      return {
+        ...response.data,
+        data: normalizeUserProfile(response.data.data) as UserProfile,
+      };
     }
 
     const response = await axiosClient.patch<ApiResponse<UserProfile>>(
@@ -108,7 +147,10 @@ const updateProfileClient = async (
       payload,
     );
 
-    return response.data;
+    return {
+      ...response.data,
+      data: normalizeUserProfile(response.data.data) as UserProfile,
+    };
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
     throw new Error(
