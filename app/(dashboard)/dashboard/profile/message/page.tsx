@@ -1,6 +1,8 @@
 "use client";
 
+import { useUserProfile } from "@/actions/hooks/auth.hooks";
 import {
+  chatKeys,
   useChatConversations,
   useChatMessages,
   useCreateConversationMutation,
@@ -10,43 +12,42 @@ import {
   useSendChatMessageMutation,
   useUnsendChatMessageMutation,
   useUploadChatFilesMutation,
-  chatKeys,
 } from "@/actions/hooks/chat.hooks";
-import { useUserProfile } from "@/actions/hooks/auth.hooks";
+import type { ApiResponse } from "@/lib/api";
 import { getChatSocket } from "@/lib/chatSocket";
 import type {
+  ChatAttachment,
   ChatConversation,
   ChatMessage,
-  PaginatedChatMessages,
   PaginatedChatConversations,
-  ChatAttachment,
+  PaginatedChatMessages,
 } from "@/services/chat";
-import type { ApiResponse } from "@/lib/api";
+import { useQueryClient, type InfiniteData } from "@tanstack/react-query";
 import {
   FileText,
+  Forward,
   Image as ImageIcon,
+  MapPin,
   MoreVertical,
   Paperclip,
   Send,
   Trash2,
   Undo2,
-  Forward,
-  MapPin,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
+  Suspense,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-  useCallback,
   type ChangeEvent,
-  Suspense,
 } from "react";
-import { useQueryClient, type InfiniteData } from "@tanstack/react-query";
 import type { Socket } from "socket.io-client";
+import { toast } from "sonner";
 
 const formatTimeAgo = (iso?: string | null) => {
   if (!iso) return "";
@@ -631,11 +632,11 @@ function UserMessage() {
       } else {
         // Socket is not yet connected — inform the user instead of
         // calling the non-existent REST fallback.
-        alert("Chat is not connected yet. Please wait a moment and try again.");
+        toast.error("Chat is not connected yet. Please wait a moment and try again.");
       }
     } catch (error) {
       console.error("Failed to send message/upload file", error);
-      alert("Failed to upload the attachment. Please try again.");
+      toast.error("Failed to upload the attachment. Please try again.");
     }
   };
 
@@ -665,7 +666,7 @@ function UserMessage() {
     const files = Array.from(event.target.files ?? []);
     const oversized = files.filter((f) => f.size > MAX_FILE_SIZE_BYTES);
     if (oversized.length > 0) {
-      alert(
+      toast.error(
         `The following files exceed the ${MAX_FILE_SIZE_MB}MB limit and were not added:\n${oversized.map((f) => f.name).join("\n")}`,
       );
     }

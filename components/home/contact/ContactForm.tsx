@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import Title from "@/components/shared/Title/Title";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -38,10 +39,10 @@ export default function ContactForm() {
         phone: "",
         message: "",
       });
-      alert("Message sent successfully!");
+      toast.success("Message sent successfully!");
     } catch (error) {
       console.error("Error submitting form:", error);
-      alert("Failed to send message");
+      toast.error("Failed to send message");
     } finally {
       setIsLoading(false);
     }

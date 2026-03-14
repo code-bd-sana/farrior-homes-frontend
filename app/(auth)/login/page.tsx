@@ -5,9 +5,10 @@ import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, Suspense } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { LuEye, LuEyeOff, LuLock } from "react-icons/lu";
 import { MdOutlineEmail } from "react-icons/md";
+import { toast } from "sonner";
 import bgImage from "../../../public/signup.png";
 
 function LoginPageContent() {
@@ -17,6 +18,7 @@ function LoginPageContent() {
   const [agreed, setAgreed] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const handledGoogleErrorRef = useRef(false);
 
   const loginMutation = useLoginMutation({
     onSuccess: (data) => {
@@ -30,6 +32,7 @@ function LoginPageContent() {
         String(authData.user?.role ?? "user").toLowerCase() === "admin"
           ? "admin"
           : "user";
+      toast.success('Logged in Successfully!');
 
       if (normalizedRole === "admin") {
         router.push("/admin");
@@ -50,6 +53,29 @@ function LoginPageContent() {
   };
 
   const showPasswordChangedMsg = searchParams.get("passwordChanged") === "1";
+
+  useEffect(() => {
+    if (handledGoogleErrorRef.current) {
+      return;
+    }
+
+    const googleError = searchParams.get("googleError");
+    if (!googleError) {
+      return;
+    }
+
+    handledGoogleErrorRef.current = true;
+
+    const fallbackMessage =
+      googleError === "suspended"
+        ? "Your account has been suspended. Please contact support for assistance."
+        : "Google login failed. Please try again.";
+
+    const message = searchParams.get("message") || fallbackMessage;
+    toast.error(message);
+
+    router.replace("/login");
+  }, [router, searchParams]);
 
   return (
     <div className='min-h-screen w-full flex flex-col items-center justify-center relative'>

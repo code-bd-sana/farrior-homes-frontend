@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
-import { useUserOwnProperties } from "@/actions/hooks/property.hooks";
 import {
   useCreateDocumentMutation,
   useDocuments,
 } from "@/actions/hooks/document.hooks";
+import { useUserOwnProperties } from "@/actions/hooks/property.hooks";
 import type { IPropertyResponse } from "@/services/property";
+import React, { useState } from "react";
+import { toast } from "sonner";
 
 type DocumentFile = {
   _id?: string;
@@ -95,12 +96,12 @@ const FileUploadComponent = () => {
 
   const handleSubmit = async () => {
     if (!selectedProperty) {
-      alert("Please select a property");
+      toast.warning("Please select a property");
       return;
     }
 
     if (files.length === 0) {
-      alert("Please select at least one file");
+      toast.warning("Please select at least one file");
       return;
     }
 
@@ -113,9 +114,9 @@ const FileUploadComponent = () => {
       // Reset form on success
       setSelectedProperty("");
       setFiles([]);
-      alert("Document uploaded successfully");
+      toast.success("Document uploaded successfully");
     } catch (error) {
-      alert(
+      toast.error(
         error instanceof Error ? error.message : "Failed to upload document",
       );
     }

@@ -282,7 +282,7 @@ export default function DashboardSidebar() {
 
               {showSettings && (
                 <div className='mt-2 ml-4 pl-4 space-y-1 border-l-2 border-gray-300'>
-                  <a
+             {    <a
                     href='/settings#notifications'
                     className={`block py-2 px-3 rounded ${
                       pathname === "/settings" &&
@@ -291,7 +291,7 @@ export default function DashboardSidebar() {
                         : "hover:bg-gray-50 text-gray-700"
                     }`}>
                     Notification settings
-                  </a>
+                  </a>}
                   <a
                     href='/settings#security'
                     className={`block py-2 px-3 rounded ${
