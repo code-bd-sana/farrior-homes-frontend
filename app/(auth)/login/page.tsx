@@ -163,9 +163,11 @@ function LoginPageContent() {
             </label>
           </div>
           <div>
-            <p className='text-sm text-green-600 hover:underline cursor-pointer'>
+            <Link
+              href='/forgot-password'
+              className='text-sm text-green-600 hover:underline cursor-pointer'>
               Forgot password?
-            </p>
+            </Link>
           </div>
         </div>
 
