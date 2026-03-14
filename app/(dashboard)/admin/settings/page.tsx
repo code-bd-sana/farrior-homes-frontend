@@ -1,9 +1,17 @@
 import NotificationPage from "@/components/shared/NotificationPage/NotificationPage";
+import { getCurrentUserFromTokenAction } from "@/services/auth";
+import { ReactNode } from "react";
 
-export default function page() {
+export default async function page({
+  children,
+}: {
+  children: ReactNode;
+}) {
+    const authState = await getCurrentUserFromTokenAction();
+
   return (
     <div>
-      <NotificationPage />
+      <NotificationPage userRole={authState.userRole} />
     </div>
   );
 }

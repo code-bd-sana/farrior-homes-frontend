@@ -15,6 +15,9 @@ interface PasswordFieldProps {
   show: boolean;
   onToggle: () => void;
 }
+type NotificationProp = {
+  userRole:string
+}
 
 function PasswordField({
   label,
@@ -51,12 +54,13 @@ function PasswordField({
   );
 }
 
-export default function NotificationPage() {
+export default function NotificationPage({userRole}: NotificationProp) {
   // ============================================================================
   // React Query Hooks
   // ============================================================================
   
   // Get all notification settings
+
   const { 
     data: settings, 
     isLoading, 
@@ -66,7 +70,7 @@ export default function NotificationPage() {
   } = useNotificationSettings();
 
   console.log(settings, 'kire settngs');
-  
+
   // Toggle mutation
   const { 
     toggleSetting, 
@@ -257,10 +261,12 @@ useEffect(() => {
   return (
     <div className=''>
       {/* ── Notification Settings ── */}
-      <h1 className='text-4xl mb-6'>Notification Settings</h1>
+  {
+    userRole === 'admin' &&     <h1 className='text-4xl mb-6'>Notification Settings</h1>
+  }
 
       {/* Notification List */}
-      <div id='notifications' className='overflow-hidden'>
+   {  userRole === 'admin' && <div id='notifications' className='overflow-hidden'>
         {settings?.map((setting, index) => {
           const isLoading = isToggling && Boolean(setting._id);
           
@@ -288,7 +294,7 @@ useEffect(() => {
 </div>
           );
         })}
-      </div>
+      </div>}
 
       {/* ── Security Settings ── */}
   {/* ── Security Settings ── */}
@@ -296,10 +302,10 @@ useEffect(() => {
         id='security'
         className='flex items-center justify-between mt-10 mb-4 flex-wrap gap-2'>
         <h2 className='text-4xl mb-6'>Security Settings</h2>
-        <button className='flex items-center gap-1.5 bg-[#4a7c5c] hover:bg-[#3a6347] text-white text-[16px] px-4 py-2 rounded-md transition-colors'>
+        {/* <button className='flex items-center gap-1.5 bg-[#4a7c5c] hover:bg-[#3a6347] text-white text-[16px] px-4 py-2 rounded-md transition-colors'>
           <FiEdit3 size={15} />
           Edit
-        </button>
+        </button> */}
       </div>
 
       {/* Auth Card */}

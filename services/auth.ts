@@ -40,6 +40,7 @@ export type AuthNavbarState = {
   isLoggedIn: boolean;
   userRole: "user" | "admin";
   isSubscribed: boolean;
+  
 };
 
 export type AddAddressPayload = {
