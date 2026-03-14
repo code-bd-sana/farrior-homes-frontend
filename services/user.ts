@@ -48,11 +48,12 @@ type AdminUser = {
   name?: string;
   email?: string;
   phone?: string;
-  profileImage?: string;
+  profileImage?: string | { key?: string; image?: string };
   homeAddress?: string;
   officeAddress?: string;
   address?: string;
   isSubscribed?: boolean;
+  isSuspended?: boolean;
   propertiesOwn?: number;
   propertiesBuy?: number;
   propertiesSell?: number;

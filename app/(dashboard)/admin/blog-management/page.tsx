@@ -6,16 +6,17 @@ import {
   useDeleteArticleMutation,
   useUpdateArticleMutation,
 } from "@/actions/hooks/article.hooks";
+import Card from "@/components/shared/Card/Card";
 import {
   ArticleCategory,
   IArticleResponse,
   articleToBlog,
 } from "@/services/article";
-import Card from "@/components/shared/Card/Card";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FiTrash2, FiX } from "react-icons/fi";
+import { toast } from "sonner";
 
 const UploadCloud = () => (
   <svg
@@ -283,19 +284,23 @@ const BlogModal = ({
     const plainContent = stripHtml(content);
 
     if (!cleanTitle) {
-      window.alert("Article title is required.");
+    
+      toast.warning("Article title is required.")
       return;
     }
     if (!category) {
-      window.alert("Category is required.");
+
+      toast.warning("Category is required.")
       return;
     }
     if (!plainContent) {
-      window.alert("Blog details are required.");
+ 
+    toast.warning("Blog details are required.")
       return;
     }
     if (mode === "add" && !selectedFile) {
-      window.alert("Image is required.");
+  
+      toast.warning('Image is required.')
       return;
     }
 
@@ -519,7 +524,8 @@ export default function Page() {
     if (modalMode === "edit" && selectedArticle) {
       const id = selectedArticle._id || selectedArticle.id;
       if (!id) {
-        window.alert("Article id is missing.");
+
+        toast.warning('Article id is missing.')
         return;
       }
 
@@ -528,7 +534,8 @@ export default function Page() {
     }
 
     if (!payload.image) {
-      window.alert("Image is required.");
+
+      toast.warning('Image is required.')
       return;
     }
 
@@ -541,7 +548,8 @@ export default function Page() {
   const handleDelete = async (article: IArticleResponse) => {
     const id = article._id || article.id;
     if (!id) {
-      window.alert("Article id is missing.");
+ 
+      toast.warning("Article id is missing.")
       return;
     }
 
@@ -554,7 +562,8 @@ export default function Page() {
   const handleViewDetails = (article: IArticleResponse) => {
     const id = article._id || article.id;
     if (!id) {
-      window.alert("Article id is missing.");
+  
+      toast.warning("Article id is missing.")
       return;
     }
 

@@ -9,6 +9,7 @@ import PropertyForm from "@/components/dashboard/property/PropertyForm";
 import Location from "@/components/home/property/Location";
 import { PropertyStatus } from "@/services/property";
 import { useState } from "react";
+import { toast } from "sonner";
 
 type AddPropertyFormData = {
   propertyName: string;
@@ -61,7 +62,7 @@ export default function AddProperty() {
     onSuccess: () => {
       // Refetch user properties AFTER creation
       refetchUserProperties();
-      alert("Property created successfully!");
+      toast.success('Property Created Successfully')
       // Reset form if needed
       setFormData({
         propertyName: "",
