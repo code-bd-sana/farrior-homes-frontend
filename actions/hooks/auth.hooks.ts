@@ -27,6 +27,16 @@ type ApiErrorResponse = {
   message?: string;
 };
 
+export type ForgotPasswordPayload = {
+  email: string;
+};
+
+export type ResetPasswordPayload = {
+  token: string;
+  newPassword: string;
+  confirmNewPassword: string;
+};
+
 type ProfileImageValue =
   | string
   | {
@@ -161,6 +171,44 @@ const updateProfileClient = async (
   }
 };
 
+const forgotPasswordClient = async (
+  payload: ForgotPasswordPayload,
+): Promise<ApiResponse<null>> => {
+  try {
+    const response = await axiosClient.post<ApiResponse<null>>(
+      "/auth/forgot-password",
+      payload,
+    );
+    return response.data;
+  } catch (error) {
+    const axiosError = error as AxiosError<ApiErrorResponse>;
+    throw new Error(
+      axiosError.response?.data?.message ||
+        axiosError.message ||
+        "Failed to request password reset",
+    );
+  }
+};
+
+const resetPasswordClient = async (
+  payload: ResetPasswordPayload,
+): Promise<ApiResponse<null>> => {
+  try {
+    const response = await axiosClient.post<ApiResponse<null>>(
+      "/auth/reset-password",
+      payload,
+    );
+    return response.data;
+  } catch (error) {
+    const axiosError = error as AxiosError<ApiErrorResponse>;
+    throw new Error(
+      axiosError.response?.data?.message ||
+        axiosError.message ||
+        "Failed to reset password",
+    );
+  }
+};
+
 // Query Keys
 export const authKeys = {
   all: ["auth"] as const,
@@ -264,6 +312,36 @@ export const useRegisterMutation = (
     mutationFn: registerAction,
     onError: (error, variables, onMutateResult, context) => {
       console.error("Registration failed:", error);
+      if (options?.onError) {
+        options.onError(error, variables, onMutateResult, context);
+      }
+    },
+    ...options,
+  });
+};
+
+export const useForgotPasswordMutation = (
+  options?: UseMutationOptions<ApiResponse<null>, Error, ForgotPasswordPayload>,
+) => {
+  return useMutation({
+    mutationFn: forgotPasswordClient,
+    onError: (error, variables, onMutateResult, context) => {
+      console.error("Forgot password request failed:", error);
+      if (options?.onError) {
+        options.onError(error, variables, onMutateResult, context);
+      }
+    },
+    ...options,
+  });
+};
+
+export const useResetPasswordMutation = (
+  options?: UseMutationOptions<ApiResponse<null>, Error, ResetPasswordPayload>,
+) => {
+  return useMutation({
+    mutationFn: resetPasswordClient,
+    onError: (error, variables, onMutateResult, context) => {
+      console.error("Reset password failed:", error);
       if (options?.onError) {
         options.onError(error, variables, onMutateResult, context);
       }
@@ -454,6 +532,8 @@ export const useAuth = () => {
 
   const loginMutation = useLoginMutation();
   const registerMutation = useRegisterMutation();
+  const forgotPasswordMutation = useForgotPasswordMutation();
+  const resetPasswordMutation = useResetPasswordMutation();
   const logoutMutation = useLogoutMutation();
   const addAddressMutation = useAddAddressMutation();
   const updateProfileMutation = useUpdateProfileMutation();
@@ -477,6 +557,8 @@ export const useAuth = () => {
     // Mutations
     login: loginMutation,
     register: registerMutation,
+    forgotPassword: forgotPasswordMutation,
+    resetPassword: resetPasswordMutation,
     logout: logoutMutation,
     addAddress: addAddressMutation,
     updateProfile: updateProfileMutation,
