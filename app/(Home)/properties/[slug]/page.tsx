@@ -268,7 +268,7 @@ export default function Page() {
                           savePropertyMutation.isPending ||
                           unsavePropertyMutation.isPending
                         }
-                        className='border border-[#D1CEC6] rounded-lg p-3 disabled:opacity-50 disabled:cursor-not-allowed'
+                        className='border border-[#D1CEC6] rounded-lg p-3 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
                         aria-label={isSaved ? "Unsave property" : "Save property"}>
                         <Heart
                           className={isSaved ? "fill-red-500 text-red-500" : "text-(--primary)"}

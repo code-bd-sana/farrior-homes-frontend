@@ -16,6 +16,21 @@ export default function UserDetailsModal({
   onClose,
 }: UserDetailsModalProps) {
   const { data: user, isLoading, isError, error } = useGetUserById(userId);
+  const propertiesOwn = Array.isArray(user?.propertyOwn)
+    ? user.propertyOwn.length
+    : typeof user?.propertyOwnCount === "number"
+    ? user.propertyOwnCount
+    : 0;
+  const propertiesBuy = Array.isArray(user?.propertyBuy)
+    ? user.propertyBuy.length
+    : typeof user?.propertyBuyCount === "number"
+    ? user.propertyBuyCount
+    : 0;
+  const propertiesSell = Array.isArray(user?.propertySell)
+    ? user.propertySell.length
+    : typeof user?.propertySellCount === "number"
+    ? user.propertySellCount
+    : 0;
 
   useEffect(() => {
     if (!open) return;
@@ -85,19 +100,19 @@ export default function UserDetailsModal({
                 <span className='font-medium text-gray-700'>
                   Properties Own:
                 </span>{" "}
-                {user.propertiesOwn ?? 0}
+                {propertiesOwn ?? 0}
               </div>
               <div className='mb-2'>
                 <span className='font-medium text-gray-700'>
                   Properties Buy:
                 </span>{" "}
-                {user.propertiesBuy ?? 0}
+                {propertiesBuy ?? 0}
               </div>
               <div className='mb-2'>
                 <span className='font-medium text-gray-700'>
                   Properties Sell:
                 </span>{" "}
-                {user.propertiesSell ?? 0}
+                {propertiesSell ?? 0}
               </div>
             </div>
           </div>
