@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import {
   useCreateServiceMutation,
   useDeleteServiceMutation,
@@ -8,7 +7,9 @@ import {
   useUpdateServiceMutation,
 } from "@/actions/hooks/service.hooks";
 import type { ICreateService, IServiceResponse } from "@/services/service";
+import { useMemo, useState } from "react";
 import { FiTrash2, FiX } from "react-icons/fi";
+import { toast } from "sonner";
 
 const MAX_DESCRIPTION_POINTS = 4;
 
@@ -84,19 +85,23 @@ const ServiceModal = ({
       .filter((item) => item.text.length > 0);
 
     if (!cleanTitle || typeof cleanTitle !== "string") {
-      window.alert("Service title is required and must be a string.");
+
+      toast.warning("Service title is required and must be a string.")
       return;
     }
     if (!cleanSubTitle || typeof cleanSubTitle !== "string") {
-      window.alert("Subtitle is required and must be a string.");
+
+      toast.warning("Subtitle is required and must be a string.")
       return;
     }
     if (cleanDescription.length === 0) {
-      window.alert("At least one description point is required.");
+
+      toast.warning('At least one description point is required.')
       return;
     }
     if (cleanDescription.length > 4) {
-      window.alert("Maximum 4 description items are allowed.");
+
+      toast.warning('Maximum 4 description items are allowed.')
       return;
     }
 
@@ -265,7 +270,8 @@ const Page = () => {
     if (modalMode === "edit" && selectedService) {
       const id = selectedService._id || selectedService.id;
       if (!id) {
-        window.alert("Service id is missing.");
+
+        toast.warning('Service id is missing.')
         return;
       }
 
@@ -282,7 +288,7 @@ const Page = () => {
   const handleDelete = async (service: IServiceResponse) => {
     const id = service._id || service.id;
     if (!id) {
-      window.alert("Service id is missing.");
+      toast.warning('Service id is missing.')
       return;
     }
 

@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import UserDetailsModal from "./UserDetailsModal";
-import Image from "next/image";
 import { useGetAllUsersAdmin } from "@/actions/hooks/user.hooks";
 import Pagination from "@/components/pagination/Pagination";
-import { Loader2, Search, MoreVertical } from "lucide-react";
 import { suspendToggleUser } from "@/services/user";
+import { Loader2, MoreVertical, Search } from "lucide-react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import UserDetailsModal from "./UserDetailsModal";
 
 const PER_PAGE = 9;
 
@@ -49,6 +50,9 @@ export default function UserManagement() {
     (user) => String(user.role || "").toUpperCase() !== "ADMIN",
   );
 
+  const getUserKey = (user: { _id?: string; id?: string | number }) =>
+    String(user._id ?? user.id ?? "");
+
   // Initialize userSuspendState only when users are loaded and state is empty
   useEffect(() => {
     if (
@@ -57,7 +61,10 @@ export default function UserManagement() {
     ) {
       const state: Record<string, boolean> = {};
       filteredUsers.forEach((user) => {
-        state[String(user._id)] = !!user.isSuspended;
+        const userKey = getUserKey(user);
+        if (userKey) {
+          state[userKey] = !!user.isSuspended;
+        }
       });
       setUserSuspendState(state);
     }
@@ -87,8 +94,11 @@ export default function UserManagement() {
   }
 
   const tableRows = filteredUsers.map((user) => ({
-    id: user._id ? String(user._id) : "",
-    image: "/user.png",
+    id: getUserKey(user),
+    image:
+      typeof user.profileImage === "string"
+        ? user.profileImage
+        : user.profileImage?.image || "/user.png",
     profileName: user.name || "Unknown",
     email: user.email || "N/A",
     phone: user.phone || "N/A",
@@ -100,7 +110,7 @@ export default function UserManagement() {
       typeof user.propertyBuyCount === "number" ? user.propertyBuyCount : 0,
     propertiesSell:
       typeof user.propertySellCount === "number" ? user.propertySellCount : 0,
-    isSuspended: userSuspendState[String(user._id)] ?? false,
+    isSuspended: userSuspendState[getUserKey(user)] ?? !!user.isSuspended,
   }));
 
   return (
@@ -242,14 +252,20 @@ export default function UserManagement() {
                           onClick={async () => {
                             setSuspendLoadingId(user.id);
                             try {
+                              const nextSuspendedState = !user.isSuspended;
                               const updated = await suspendToggleUser(user.id);
                               setUserSuspendState((prev) => ({
                                 ...prev,
                                 [user.id]: !!updated.isSuspended,
                               }));
+                              toast.success(
+                                nextSuspendedState
+                                  ? "User suspended successfully"
+                                  : "User unsuspended successfully",
+                              );
                               setMenuOpenId(null);
                             } catch (err) {
-                              alert(
+                              toast.error(
                                 (err as Error).message ||
                                   "Failed to toggle suspension",
                               );

@@ -7,6 +7,7 @@ import type {
   MaintenanceStatus,
   ICreateMaintenance,
 } from "@/services/maintenance";
+import { toast } from "sonner";
 
 const MAINTENANCE_STATUS: Array<{ value: MaintenanceStatus; label: string }> = [
   { value: "PENDING" as MaintenanceStatus, label: "Pending" },
@@ -78,19 +79,19 @@ const MaintenanceModal = ({
 
     // Validation
     if (!amenities.trim()) {
-      alert("Amenities is required");
+      toast.warning("Amenities is required");
       return;
     }
     if (!task.trim()) {
-      alert("Task is required");
+      toast.warning("Task is required");
       return;
     }
     if (!reminderDate) {
-      alert("Reminder date is required");
+      toast.warning("Reminder date is required");
       return;
     }
     if (!description.trim()) {
-      alert("Description is required");
+      toast.warning("Description is required");
       return;
     }
 

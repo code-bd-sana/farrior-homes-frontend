@@ -1,15 +1,16 @@
 'use client'
 
 import {
-    usePropertyById,
-    useUpdatePropertyMutation,
-    useUserOwnProperties,
+  usePropertyById,
+  useUpdatePropertyMutation,
+  useUserOwnProperties,
 } from '@/actions/hooks/property.hooks';
 import PropertyDetailsForm from '@/components/dashboard/property/PropertyDetailsForm';
 import PropertyForm from '@/components/dashboard/property/PropertyForm';
 import { IPropertyResponse, PropertyStatus } from '@/services/property';
 import { useParams } from 'next/navigation';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { toast } from "sonner";
 
 type UpdatePropertyFormData = {
   propertyName: string;
@@ -102,7 +103,7 @@ const UpdatePropertyPage = () => {
     onSuccess: () => {
       refetchUserProperties();
       refetchPropertyById();
-      alert('Property updated successfully!');
+      toast.success('Property updated successfully!');
     },
     onError: (err: Error) => {
       setErrors((prev) => ({ ...prev, submit: err.message }));

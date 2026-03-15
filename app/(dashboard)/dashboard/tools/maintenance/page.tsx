@@ -1,18 +1,19 @@
 "use client";
 
-import Pagination from "@/components/pagination/Pagination";
 import {
-  useMaintenances,
   useCreateMaintenanceMutation,
-  useUpdateMaintenanceMutation,
   useDeleteMaintenanceMutation,
+  useMaintenances,
+  useUpdateMaintenanceMutation,
 } from "@/actions/hooks/maintenance.hooks";
-import type {
-  IMaintenanceResponse,
-  ICreateMaintenance,
-} from "@/services/maintenance";
 import MaintenanceModal from "@/components/dashboard/modal/MaintenanceModal";
+import Pagination from "@/components/pagination/Pagination";
+import type {
+  ICreateMaintenance,
+  IMaintenanceResponse,
+} from "@/services/maintenance";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const PER_PAGE = 9;
 
@@ -60,26 +61,25 @@ export default function MaintenanceManagement() {
     if (modalMode === "edit" && selectedMaintenance) {
       const id = selectedMaintenance._id || selectedMaintenance.id;
       if (!id) {
-        alert("Maintenance ID is missing");
+        toast.warning("Maintenance ID is missing");
         return;
       }
 
       await updateMutation.mutateAsync({ id, data });
-      alert("Maintenance updated successfully");
+      toast.success("Maintenance updated successfully");
       refetch();
       closeModal();
     } else if (modalMode === "add") {
       await createMutation.mutateAsync(data);
-      alert("Maintenance created successfully");
+      toast.success("Maintenance created successfully");
       refetch();
       closeModal();
     }
   };
 
   const handleDelete = async (id: string) => {
-    // Remove the confirm alert completely
     await deleteMutation.mutateAsync(id);
-    alert("Maintenance deleted successfully");
+    toast.success("Maintenance deleted successfully");
     refetch();
     closeModal();
   };

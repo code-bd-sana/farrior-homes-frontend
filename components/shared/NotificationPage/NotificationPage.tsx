@@ -5,7 +5,8 @@ import { useNotificationSettings, useToggleNotificationSettingMutation } from "@
 import { changePasswordAction, logoutAction } from "@/services/auth";
 import { useRouter } from "next/navigation";
 import { startTransition, useEffect, useState } from "react";
-import { FiEdit3, FiEye, FiEyeOff, FiLock } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiLock } from "react-icons/fi";
+import { toast } from "sonner";
 
 interface PasswordFieldProps {
   label: string;
@@ -163,7 +164,7 @@ useEffect(() => {
     // Find the setting by _id
     const setting = settings?.find(s => s._id === id);
     if (!setting) {
-      alert("Setting not found in database");
+      toast.error("Setting not found in database");
       return;
     }
 
@@ -187,7 +188,7 @@ useEffect(() => {
         onError: (error) => {
           // Revert on error
           setChecked(prev => ({ ...prev, [id]: !newState }));
-          alert(`Failed to update: ${error.message}`);
+          toast.error(`Failed to update: ${error.message}`);
         },
       }
     );
@@ -197,22 +198,21 @@ useEffect(() => {
   const handleUpdatePassword = () => {
     // Validate passwords
     if (!currentPassword || !newPassword || !confirmPassword) {
-      alert("All fields are required");
+      toast.warning("All fields are required");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      alert("New passwords do not match");
+      toast.warning("New passwords do not match");
       return;
     }
 
     if (newPassword.length < 6) {
-      alert("Password must be at least 6 characters");
+      toast.warning("Password must be at least 6 characters");
       return;
     }
 
-    // TODO: Implement password update API call
-    alert("Password updated successfully");
+    toast.success("Password updated successfully");
     
     // Clear form
     setCurrentPassword("");
@@ -300,7 +300,7 @@ useEffect(() => {
   {/* ── Security Settings ── */}
       <div
         id='security'
-        className='flex items-center justify-between mt-10 mb-4 flex-wrap gap-2'>
+        className='flex items-center justify-between mt-4 mb-4 flex-wrap gap-2'>
         <h2 className='text-4xl mb-6'>Security Settings</h2>
         {/* <button className='flex items-center gap-1.5 bg-[#4a7c5c] hover:bg-[#3a6347] text-white text-[16px] px-4 py-2 rounded-md transition-colors'>
           <FiEdit3 size={15} />

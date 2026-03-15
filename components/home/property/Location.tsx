@@ -3,6 +3,7 @@
 
 import { Loader2, MapPin, Navigation, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 interface LocationProps {
   address?: string;
@@ -114,7 +115,7 @@ export default function Location({
   // Get current location
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser");
+      toast.error("Geolocation is not supported by your browser");
       return;
     }
 
@@ -153,7 +154,7 @@ export default function Location({
       },
       (error) => {
         console.error("Error getting location:", error);
-        alert("Could not get your location. Please search manually.");
+        toast.error("Could not get your location. Please search manually.");
         setLoading(false);
       }
     );
@@ -222,7 +223,7 @@ export default function Location({
                   onClick={() => handleSelectPlace(place)}
                   className='w-full text-left px-4 py-3 hover:bg-gray-50 flex items-start gap-3 border-b border-gray-100 last:border-0'
                 >
-                  <MapPin size={18} className='text-gray-400 mt-0.5 flex-shrink-0' />
+                  <MapPin size={18} className='text-gray-400 mt-0.5 shrink-0' />
                   <div className='flex-1'>
                     <div className='text-sm font-medium text-gray-900'>
                       {place.display_name.split(',')[0]}

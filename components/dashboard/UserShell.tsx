@@ -33,7 +33,7 @@ type NavItem = {
   children?: { label: string; hash: string }[];
 };
 
-export default function UserShell({ children, isSubscribed }: UserShellProps) {
+export default function UserShell({ children, isSubscribed, userRole }: UserShellProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [currentHash, setCurrentHash] = useState("");
@@ -122,10 +122,7 @@ export default function UserShell({ children, isSubscribed }: UserShellProps) {
         label: "Settings",
         href: "/dashboard/profile/settings",
         icon: LuSettings2,
-        children: [
-          { label: "Notification Settings", hash: "#notifications" },
-          { label: "Security Settings", hash: "#security" },
-        ],
+       
       },
     ];
 

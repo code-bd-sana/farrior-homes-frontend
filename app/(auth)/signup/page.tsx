@@ -1,16 +1,17 @@
 "use client";
 
+import { useRegisterMutation } from "@/actions/hooks/auth.hooks";
+import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { AiOutlineUser } from "react-icons/ai";
 import { FiPhone } from "react-icons/fi";
 import { LuEye, LuEyeOff, LuLock } from "react-icons/lu";
 import { MdOutlineEmail } from "react-icons/md";
-import { ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
 import bgImage from "../../../public/signup.png";
-import { useRegisterMutation } from "@/actions/hooks/auth.hooks";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function SignupPage() {
   const registerMutation = useRegisterMutation({
     onSuccess: (data) => {
       if (data.success) {
+        toast.success('User Registered Successfully!')
         setTimeout(() => {
           router.push("/login");
         }, 700);

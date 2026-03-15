@@ -1,8 +1,8 @@
 "use client";
-import { useEffect } from "react";
+import { useGetUserById } from "@/actions/hooks/user.hooks";
 import { Loader2, X } from "lucide-react";
 import Image from "next/image";
-import { useGetUserById } from "@/actions/hooks/user.hooks";
+import { useEffect } from "react";
 
 interface UserDetailsModalProps {
   userId: string;
@@ -16,6 +16,21 @@ export default function UserDetailsModal({
   onClose,
 }: UserDetailsModalProps) {
   const { data: user, isLoading, isError, error } = useGetUserById(userId);
+  const propertiesOwn = Array.isArray(user?.propertyOwn)
+    ? user.propertyOwn.length
+    : typeof user?.propertyOwnCount === "number"
+    ? user.propertyOwnCount
+    : 0;
+  const propertiesBuy = Array.isArray(user?.propertyBuy)
+    ? user.propertyBuy.length
+    : typeof user?.propertyBuyCount === "number"
+    ? user.propertyBuyCount
+    : 0;
+  const propertiesSell = Array.isArray(user?.propertySell)
+    ? user.propertySell.length
+    : typeof user?.propertySellCount === "number"
+    ? user.propertySellCount
+    : 0;
 
   useEffect(() => {
     if (!open) return;
@@ -48,13 +63,17 @@ export default function UserDetailsModal({
         ) : user ? (
           <div className='flex flex-col items-center gap-4'>
             <div className='w-20 h-20 rounded-full overflow-hidden bg-gray-100 border border-gray-200'>
-              <Image
-                src={user.profileImage || "/user.png"}
-                alt={user.name || "User"}
-                width={80}
-                height={80}
-                className='w-full h-full object-cover'
-              />
+             <Image
+  src={
+    typeof user.profileImage === "string"
+      ? user.profileImage
+      : user.profileImage?.image || "/user.png"
+  }
+  alt={user.name || "User"}
+  width={80}
+  height={80}
+  className='w-full h-full object-cover'
+/>
             </div>
             <div className='w-full'>
               <div className='mb-2'>
@@ -81,19 +100,19 @@ export default function UserDetailsModal({
                 <span className='font-medium text-gray-700'>
                   Properties Own:
                 </span>{" "}
-                {user.propertiesOwn ?? 0}
+                {propertiesOwn ?? 0}
               </div>
               <div className='mb-2'>
                 <span className='font-medium text-gray-700'>
                   Properties Buy:
                 </span>{" "}
-                {user.propertiesBuy ?? 0}
+                {propertiesBuy ?? 0}
               </div>
               <div className='mb-2'>
                 <span className='font-medium text-gray-700'>
                   Properties Sell:
                 </span>{" "}
-                {user.propertiesSell ?? 0}
+                {propertiesSell ?? 0}
               </div>
             </div>
           </div>

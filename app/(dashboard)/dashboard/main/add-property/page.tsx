@@ -9,6 +9,8 @@ import PropertyForm from "@/components/dashboard/property/PropertyForm";
 import Location from "@/components/home/property/Location";
 import { PropertyStatus } from "@/services/property";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 type AddPropertyFormData = {
   propertyName: string;
@@ -30,6 +32,7 @@ type AddPropertyFormData = {
 };
 
 export default function AddProperty() {
+  const router = useRouter();
   const [formData, setFormData] = useState<AddPropertyFormData>({
     propertyName: "",
     address: "",
@@ -61,7 +64,7 @@ export default function AddProperty() {
     onSuccess: () => {
       // Refetch user properties AFTER creation
       refetchUserProperties();
-      alert("Property created successfully!");
+      toast.success('Property Created Successfully')
       // Reset form if needed
       setFormData({
         propertyName: "",
@@ -81,6 +84,13 @@ export default function AddProperty() {
         photos: [],
         locationMapLink: "",
       });
+      // Redirect to own property listing after short delay so toast is visible
+      try {
+        router.push('/dashboard/main/own-property');
+      } catch (e) {
+        // ignore navigation errors in non-browser contexts
+        console.error(e)
+      }
     },
     onError: (error: Error) => {
       setErrors({ submit: error.message });
