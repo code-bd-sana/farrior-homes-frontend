@@ -17,7 +17,7 @@ const TestTablePage = () => {
     "Address",
     "Subscription Status",
     "Property Own",
-    "Property Buy",
+    // "Property Buy",
     "Property Sell",
     "Rating",
     "Action",

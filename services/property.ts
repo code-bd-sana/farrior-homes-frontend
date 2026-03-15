@@ -96,7 +96,6 @@ export interface PaginatedSavedPropertiesResponse {
 export interface SavedPropertyOverviewResponse {
   stats: {
     ownCount: number;
-    buyCount: number;
     sellCount: number;
     rentCount: number;
     savedCount: number;
@@ -428,9 +427,9 @@ export const getSavedPropertyOverview = async (): Promise<
   ApiResponse<SavedPropertyOverviewResponse>
 > => {
   try {
-    const response = await axiosClient.get<ApiResponse<SavedPropertyOverviewResponse>>(
-      "/save-property/overview",
-    );
+    const response = await axiosClient.get<
+      ApiResponse<SavedPropertyOverviewResponse>
+    >("/save-property/overview");
     return response.data;
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
