@@ -1,6 +1,7 @@
 "use client";
 
 import { useLoginMutation } from "@/actions/hooks/auth.hooks";
+import { API_BASE_URL } from "@/lib/api";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -220,9 +221,7 @@ function LoginPageContent() {
             className='w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer'
             disabled={loginMutation.isPending}
             onClick={() => {
-              const apiUrl =
-                process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000/api";
-              window.location.href = `${apiUrl}/auth/google`;
+              window.location.href = `${API_BASE_URL}/auth/google`;
             }}>
             <svg className='w-7 h-7' viewBox='0 0 24 24'>
               <path

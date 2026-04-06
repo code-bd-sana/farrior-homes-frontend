@@ -1,5 +1,6 @@
 "use server";
 
+import { API_BASE_URL } from "@/lib/api";
 import { axiosServer } from "@/lib/axiosServer";
 import type { UserProfile } from "@/types/user";
 import { AxiosError } from "axios";
@@ -88,7 +89,7 @@ export async function registerAction(payload: RegisterPayload) {
   try {
     const axiosInstance = await getAxiosInstance();
     const response = await axiosInstance.post<ApiResponse<unknown>>(
-      "/auth/register",
+      `${API_BASE_URL}/auth/register`,
       payload,
     );
 
@@ -136,7 +137,7 @@ export async function loginAction(
   try {
     const axiosInstance = await getAxiosInstance();
     const response = await axiosInstance.post<ApiResponse<LoginData>>(
-      "/auth/login",
+      `${API_BASE_URL}/auth/login`,
       payload,
     );
 
@@ -251,7 +252,7 @@ export async function addAddressAction(payload: AddAddressPayload) {
           };
 
     const response = await axiosInstance.patch<ApiResponse<UserProfile>>(
-      "/users/me",
+      `${API_BASE_URL}/users/me`,
       body,
     );
 
@@ -281,7 +282,7 @@ export async function updateProfileAction(payload: UpdateProfilePayload) {
   try {
     const axiosInstance = await getAxiosInstance();
     const response = await axiosInstance.patch<ApiResponse<UserProfile>>(
-      "/users/me",
+      `${API_BASE_URL}/users/me`,
       payload,
     );
 
@@ -317,7 +318,7 @@ export async function changePasswordAction(payload: ChangePasswordPayload) {
   try {
     const axiosInstance = await getAxiosInstance();
     const response = await axiosInstance.patch<ApiResponse<unknown>>(
-      "/auth/change-password",
+      `${API_BASE_URL}/auth/change-password`,
       payload,
     );
     return response.data;
