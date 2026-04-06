@@ -1,6 +1,7 @@
 "use client";
 
 import { useRegisterMutation } from "@/actions/hooks/auth.hooks";
+import { API_BASE_URL } from "@/lib/api";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -290,9 +291,7 @@ export default function SignupPage() {
           <button
             type='button'
             onClick={() => {
-              const apiUrl =
-                process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000/api";
-              window.location.href = `${apiUrl}/auth/google`;
+              window.location.href = `${API_BASE_URL}/auth/google`;
             }}
             className='w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer'
             disabled={registerMutation.isPending}>

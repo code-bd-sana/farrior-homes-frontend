@@ -1,8 +1,9 @@
-interface config  {
-  BASE_URL:string
-};
+import { API_BASE_URL } from "@/lib/api";
 
-
-export const config:config= {
-  BASE_URL:process.env.NEXT_PUBLIC_BASE_URL as string 
+interface config {
+  BASE_URL: string;
 }
+
+export const config: config = {
+  BASE_URL: API_BASE_URL,
+};

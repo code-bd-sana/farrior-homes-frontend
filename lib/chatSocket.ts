@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+import { API_ORIGIN } from "@/lib/api";
 import { io, Socket } from "socket.io-client";
 
 let socket: Socket | null = null;
@@ -11,10 +12,7 @@ export const getChatSocket = (): Socket => {
   if (!socket) {
     const token = Cookies.get("accessToken") ?? null;
 
-    const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000")
-      .replace(/\/api$/, "");
-
-    socket = io(`${baseUrl}/chat`, {
+    socket = io(`${API_ORIGIN}/chat`, {
       auth: {
         token: token,
       },
