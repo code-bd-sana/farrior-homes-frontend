@@ -63,7 +63,7 @@ export type UpdateProfilePayload = {
 interface ApiResponse<T> {
   success: boolean;
   message: string;
-  data: T;
+  data: T | null;
 }
 
 interface ApiErrorResponse {
@@ -77,6 +77,23 @@ interface ApiErrorResponse {
 
 async function getAxiosInstance() {
   return await axiosServer();
+}
+
+function getActionErrorMessage(
+  error: unknown,
+  fallbackMessage: string,
+): string {
+  const axiosError = error as AxiosError<ApiErrorResponse>;
+
+  console.error("Auth action error details:", {
+    message: axiosError.message,
+    response: axiosError.response?.data,
+    status: axiosError.response?.status,
+  });
+
+  return (
+    axiosError.response?.data?.message || axiosError.message || fallbackMessage
+  );
 }
 // ============================================================================
 // Actions
@@ -96,19 +113,14 @@ export async function registerAction(payload: RegisterPayload) {
     console.log("Registration successful:", response.data);
     return response.data;
   } catch (error) {
-    const axiosError = error as AxiosError<ApiErrorResponse>;
-
-    console.error("Registration error details:", {
-      message: axiosError.message,
-      response: axiosError.response?.data,
-      status: axiosError.response?.status,
-    });
-
-    throw new Error(
-      axiosError.response?.data?.message ||
-        axiosError.message ||
+    return {
+      success: false,
+      message: getActionErrorMessage(
+        error,
         "Registration failed. Please try again.",
-    );
+      ),
+      data: null,
+    };
   }
 }
 
@@ -156,19 +168,11 @@ export async function loginAction(
 
     return response.data;
   } catch (error) {
-    const axiosError = error as AxiosError<ApiErrorResponse>;
-
-    console.error("Login error details:", {
-      message: axiosError.message,
-      response: axiosError.response?.data,
-      status: axiosError.response?.status,
-    });
-
-    throw new Error(
-      axiosError.response?.data?.message ||
-        axiosError.message ||
-        "Login failed. Please try again.",
-    );
+    return {
+      success: false,
+      message: getActionErrorMessage(error, "Login failed. Please try again."),
+      data: null,
+    };
   }
 }
 
@@ -259,19 +263,11 @@ export async function addAddressAction(payload: AddAddressPayload) {
     console.log("Address added/updated:", response.data);
     return response.data;
   } catch (error) {
-    const axiosError = error as AxiosError<ApiErrorResponse>;
-
-    console.error("Add address error:", {
-      message: axiosError.message,
-      response: axiosError.response?.data,
-      status: axiosError.response?.status,
-    });
-
-    throw new Error(
-      axiosError.response?.data?.message ||
-        axiosError.message ||
-        "Failed to update address",
-    );
+    return {
+      success: false,
+      message: getActionErrorMessage(error, "Failed to update address"),
+      data: null,
+    };
   }
 }
 
@@ -289,19 +285,11 @@ export async function updateProfileAction(payload: UpdateProfilePayload) {
     console.log("Profile updated:", response.data);
     return response.data;
   } catch (error) {
-    const axiosError = error as AxiosError<ApiErrorResponse>;
-
-    console.error("Update profile error:", {
-      message: axiosError.message,
-      response: axiosError.response?.data,
-      status: axiosError.response?.status,
-    });
-
-    throw new Error(
-      axiosError.response?.data?.message ||
-        axiosError.message ||
-        "Failed to update profile",
-    );
+    return {
+      success: false,
+      message: getActionErrorMessage(error, "Failed to update profile"),
+      data: null,
+    };
   }
 }
 
@@ -323,12 +311,11 @@ export async function changePasswordAction(payload: ChangePasswordPayload) {
     );
     return response.data;
   } catch (error) {
-    const axiosError = error as AxiosError<ApiErrorResponse>;
-    throw new Error(
-      axiosError.response?.data?.message ||
-        axiosError.message ||
-        "Failed to change password.",
-    );
+    return {
+      success: false,
+      message: getActionErrorMessage(error, "Failed to change password."),
+      data: null,
+    };
   }
 }
 
@@ -341,14 +328,11 @@ export async function logoutAction() {
     cookieStore.delete("accessToken");
 
     console.log("Logout successful");
-    return { success: true };
+    return { success: true, message: "Logout successful" };
   } catch (error) {
-    const axiosError = error as AxiosError<ApiErrorResponse>;
-
-    console.error("Logout error:", {
-      message: axiosError.message,
-    });
-
-    throw new Error(axiosError.message || "Logout failed. Please try again.");
+    return {
+      success: false,
+      message: getActionErrorMessage(error, "Logout failed. Please try again."),
+    };
   }
 }
