@@ -1,4 +1,3 @@
-import { getCurrentUserFromTokenAction } from "@/services/auth";
 import { jwtVerify, type JWTPayload } from "jose";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -12,6 +11,12 @@ type JwtPayload = JWTPayload & {
 
 const jwtSecret = process.env.JWT_SECRET;
 const jwtSecretKey = jwtSecret ? new TextEncoder().encode(jwtSecret) : null;
+const apiBaseUrl = (
+  process.env.API_BASE_URL ??
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
+  process.env.NEXT_PUBLIC_BASE_URL ??
+  ""
+).replace(/\/+$/, "");
 
 async function verifyJwt(token: string): Promise<JwtPayload | null> {
   if (!token || !jwtSecretKey) return null;
@@ -22,6 +27,52 @@ async function verifyJwt(token: string): Promise<JwtPayload | null> {
     });
 
     return payload as JwtPayload;
+  } catch {
+    return null;
+  }
+}
+
+async function getUserStateFromApi(token: string): Promise<{
+  userRole: "user" | "admin";
+  isSubscribed: boolean;
+} | null> {
+  if (!token || !apiBaseUrl) return null;
+
+  try {
+    const response = await fetch(`${apiBaseUrl}/users/me`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const result = (await response.json()) as {
+      data?: {
+        role?: string;
+        isSubscribed?: boolean | string;
+      };
+    };
+
+    const normalizedRole =
+      String(result.data?.role ?? "user").toLowerCase() === "admin"
+        ? "admin"
+        : "user";
+
+    const isSubscribedRaw = result.data?.isSubscribed;
+    const isSubscribed =
+      typeof isSubscribedRaw === "string"
+        ? isSubscribedRaw === "true"
+        : Boolean(isSubscribedRaw);
+
+    return {
+      userRole: normalizedRole,
+      isSubscribed,
+    };
   } catch {
     return null;
   }
@@ -48,27 +99,23 @@ export async function middleware(req: NextRequest) {
 
   const token = req.cookies.get("accessToken")?.value;
 
-  // Get basic info from JWT first (fast)
+  // Get basic info from JWT first when the frontend knows the JWT secret.
   const payload = token ? await verifyJwt(token) : null;
-  const isAuthenticated = Boolean(payload);
+  const isAuthenticated = Boolean(token);
 
   // Initialize default values
   let userRole = String(payload?.role ?? "").toLowerCase();
   let isSubscribed = false;
 
-  // If authenticated, get full user data including subscription status
+  // If authenticated, get full user data including subscription status.
   if (isAuthenticated && token) {
-    try {
-      // Create a request-like object for the server action
-      // We need to pass the token since middleware runs on edge
-      const userState = await getCurrentUserFromTokenAction();
-      // console.log(userState, "user state get");
+    const userState = await getUserStateFromApi(token);
+
+    if (userState) {
       userRole = userState.userRole;
       isSubscribed = userState.isSubscribed;
-    } catch (error) {
-      console.error("Failed to fetch user state in middleware:", error);
-      // Fallback to JWT data if available
-      // isSubscribed = payload?.isSubscribed === true;
+    } else {
+      // Fallback to JWT data if available.
       isSubscribed =
         payload?.isSubscribed === true ||
         payload?.subscribed === true ||
