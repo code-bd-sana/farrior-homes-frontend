@@ -27,6 +27,19 @@ type ApiErrorResponse = {
   message?: string;
 };
 
+const ensureSuccessfulAction = async <T>(
+  action: Promise<ApiResponse<T | null>>,
+  fallbackMessage: string,
+): Promise<ApiResponse<T>> => {
+  const response = await action;
+
+  if (!response.success || response.data == null) {
+    throw new Error(response.message || fallbackMessage);
+  }
+
+  return response as ApiResponse<T>;
+};
+
 export type ForgotPasswordPayload = {
   email: string;
 };
@@ -280,7 +293,8 @@ export const useLoginMutation = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: loginAction,
+    mutationFn: (payload) =>
+      ensureSuccessfulAction(loginAction(payload), "Login failed. Please try again."),
     onSuccess: (data, variables, onMutateResult, context) => {
       // Invalidate and refetch user queries
       queryClient.invalidateQueries({ queryKey: authKeys.navbarState });
@@ -309,7 +323,11 @@ export const useRegisterMutation = (
   options?: UseMutationOptions<ApiResponse<unknown>, Error, RegisterPayload>,
 ) => {
   return useMutation({
-    mutationFn: registerAction,
+    mutationFn: (payload) =>
+      ensureSuccessfulAction(
+        registerAction(payload),
+        "Registration failed. Please try again.",
+      ),
     onError: (error, variables, onMutateResult, context) => {
       console.error("Registration failed:", error);
       if (options?.onError) {
@@ -354,12 +372,24 @@ export const useResetPasswordMutation = (
  * Logout mutation hook
  */
 export const useLogoutMutation = (
-  options?: UseMutationOptions<{ success: boolean }, Error, void>,
+  options?: UseMutationOptions<
+    { success: boolean; message: string },
+    Error,
+    void
+  >,
 ) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: logoutAction,
+    mutationFn: async () => {
+      const response = await logoutAction();
+
+      if (!response.success) {
+        throw new Error(response.message || "Logout failed. Please try again.");
+      }
+
+      return response;
+    },
     onSuccess: (data, variables, onMutateResult, context) => {
       // Clear all user related queries
       queryClient.removeQueries({ queryKey: authKeys.navbarState });

@@ -140,13 +140,24 @@ useEffect(() => {
     }
     setLoading(true);
     try {
-      await changePasswordAction({
+      const passwordResponse = await changePasswordAction({
         currentPassword,
         newPassword,
         confirmNewPassword: confirmPassword,
       });
+
+      if (!passwordResponse.success) {
+        throw new Error(
+          passwordResponse.message || "Failed to update password.",
+        );
+      }
+
       // Log out and redirect to login with notification
-      await logoutAction();
+      const logoutResponse = await logoutAction();
+      if (!logoutResponse.success) {
+        throw new Error(logoutResponse.message || "Logout failed.");
+      }
+
       router.push("/login?passwordChanged=1");
     } catch (err) {
       if (err instanceof Error) {
