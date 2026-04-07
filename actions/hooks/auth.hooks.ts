@@ -2,17 +2,19 @@
 import type { ApiResponse } from "@/lib/api";
 import axiosClient from "@/lib/axiosClient";
 import {
-  getCurrentUserFromTokenAction,
-  loginAction,
   LoginData,
-  logoutAction,
-  registerAction,
   type AddAddressPayload,
   type AuthNavbarState,
   type LoginPayload,
   type RegisterPayload,
   type UpdateProfilePayload,
 } from "@/services/auth";
+import {
+  getCurrentUserClient,
+  loginClient,
+  logoutClient,
+  registerClient,
+} from "@/services/auth-client";
 import type { UserProfile } from "@/types/user";
 import { AxiosError } from "axios";
 import {
@@ -25,19 +27,6 @@ import {
 
 type ApiErrorResponse = {
   message?: string;
-};
-
-const ensureSuccessfulAction = async <T>(
-  action: Promise<ApiResponse<T | null>>,
-  fallbackMessage: string,
-): Promise<ApiResponse<T>> => {
-  const response = await action;
-
-  if (!response.success || response.data == null) {
-    throw new Error(response.message || fallbackMessage);
-  }
-
-  return response as ApiResponse<T>;
 };
 
 export type ForgotPasswordPayload = {
@@ -242,7 +231,7 @@ export const useCurrentUser = (
 ) => {
   return useQuery<AuthNavbarState>({
     queryKey: authKeys.navbarState,
-    queryFn: getCurrentUserFromTokenAction,
+    queryFn: getCurrentUserClient,
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: false,
     ...options,
@@ -293,8 +282,7 @@ export const useLoginMutation = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload) =>
-      ensureSuccessfulAction(loginAction(payload), "Login failed. Please try again."),
+    mutationFn: loginClient,
     onSuccess: (data, variables, onMutateResult, context) => {
       // Invalidate and refetch user queries
       queryClient.invalidateQueries({ queryKey: authKeys.navbarState });
@@ -323,11 +311,7 @@ export const useRegisterMutation = (
   options?: UseMutationOptions<ApiResponse<unknown>, Error, RegisterPayload>,
 ) => {
   return useMutation({
-    mutationFn: (payload) =>
-      ensureSuccessfulAction(
-        registerAction(payload),
-        "Registration failed. Please try again.",
-      ),
+    mutationFn: registerClient,
     onError: (error, variables, onMutateResult, context) => {
       console.error("Registration failed:", error);
       if (options?.onError) {
@@ -381,15 +365,7 @@ export const useLogoutMutation = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async () => {
-      const response = await logoutAction();
-
-      if (!response.success) {
-        throw new Error(response.message || "Logout failed. Please try again.");
-      }
-
-      return response;
-    },
+    mutationFn: logoutClient,
     onSuccess: (data, variables, onMutateResult, context) => {
       // Clear all user related queries
       queryClient.removeQueries({ queryKey: authKeys.navbarState });

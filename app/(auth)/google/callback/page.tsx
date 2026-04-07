@@ -1,8 +1,8 @@
 "use client";
 
-import { storeGoogleTokenAction } from "@/services/auth";
 import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Cookies from "js-cookie";
 
 function GoogleCallbackContent() {
   const router = useRouter();
@@ -17,13 +17,18 @@ function GoogleCallbackContent() {
       return;
     }
 
-    storeGoogleTokenAction(token).then(() => {
-      if (role === "admin") {
-        router.push("/admin");
-      } else {
-        router.push("/dashboard/profile");
-      }
+    Cookies.set("accessToken", token, {
+      sameSite: "lax",
+      secure: typeof window !== "undefined" && window.location.protocol === "https:",
+      path: "/",
+      expires: 1,
     });
+
+    if (role === "admin") {
+      router.push("/admin");
+    } else {
+      router.push("/dashboard/profile");
+    }
   }, [router, searchParams]);
 
   return (
