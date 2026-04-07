@@ -2,7 +2,7 @@
 
 
 import { useNotificationSettings, useToggleNotificationSettingMutation } from "@/actions/hooks/notificaton-settings.hooks";
-import { changePasswordAction, logoutAction } from "@/services/auth";
+import { changePasswordClient, logoutClient } from "@/services/auth-client";
 import { useRouter } from "next/navigation";
 import { startTransition, useEffect, useState } from "react";
 import { FiEye, FiEyeOff, FiLock } from "react-icons/fi";
@@ -140,7 +140,7 @@ useEffect(() => {
     }
     setLoading(true);
     try {
-      const passwordResponse = await changePasswordAction({
+      const passwordResponse = await changePasswordClient({
         currentPassword,
         newPassword,
         confirmNewPassword: confirmPassword,
@@ -153,7 +153,7 @@ useEffect(() => {
       }
 
       // Log out and redirect to login with notification
-      const logoutResponse = await logoutAction();
+      const logoutResponse = await logoutClient();
       if (!logoutResponse.success) {
         throw new Error(logoutResponse.message || "Logout failed.");
       }
