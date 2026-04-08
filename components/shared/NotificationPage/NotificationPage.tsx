@@ -2,7 +2,7 @@
 
 
 import { useNotificationSettings, useToggleNotificationSettingMutation } from "@/actions/hooks/notificaton-settings.hooks";
-import { changePasswordAction, logoutAction } from "@/services/auth";
+import { changePasswordClient, logoutClient } from "@/services/auth-client";
 import { useRouter } from "next/navigation";
 import { startTransition, useEffect, useState } from "react";
 import { FiEye, FiEyeOff, FiLock } from "react-icons/fi";
@@ -140,13 +140,24 @@ useEffect(() => {
     }
     setLoading(true);
     try {
-      await changePasswordAction({
+      const passwordResponse = await changePasswordClient({
         currentPassword,
         newPassword,
         confirmNewPassword: confirmPassword,
       });
+
+      if (!passwordResponse.success) {
+        throw new Error(
+          passwordResponse.message || "Failed to update password.",
+        );
+      }
+
       // Log out and redirect to login with notification
-      await logoutAction();
+      const logoutResponse = await logoutClient();
+      if (!logoutResponse.success) {
+        throw new Error(logoutResponse.message || "Logout failed.");
+      }
+
       router.push("/login?passwordChanged=1");
     } catch (err) {
       if (err instanceof Error) {

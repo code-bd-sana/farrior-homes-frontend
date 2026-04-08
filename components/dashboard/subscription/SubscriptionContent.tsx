@@ -67,11 +67,11 @@ export default function SubscriptionContent() {
   ];
 
   return (
-    <div className='lg:pr-35'>
+    <div className='xl:pr-35'>
       <p className='flex md:hidden text-2xl mb-4 text-center items-center justify-center font-semibold text-(--primary)'>
         Subscription Plan
       </p>
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-9'>
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-9'>
         {subscriptionData.map((subscription, index) => (
           <div
             key={index}

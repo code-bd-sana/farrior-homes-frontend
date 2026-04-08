@@ -26,7 +26,7 @@ export default function page() {
             "text-xl md:text-[24px] text-[#70706C] max-w-[700px] jost-400 max-w-4xl mx-auto text-center "
           }
         />
-        <div className='md:px-60 md:ml-35 mt-7 md:mt-12 -mb-6'>
+        <div className='xl:ml-35 mt-7 md:mt-12 -mb-6'>
           <SubscriptionContent />
         </div>
       </div>

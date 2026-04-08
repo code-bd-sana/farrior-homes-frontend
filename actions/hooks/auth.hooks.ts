@@ -2,17 +2,19 @@
 import type { ApiResponse } from "@/lib/api";
 import axiosClient from "@/lib/axiosClient";
 import {
-  getCurrentUserFromTokenAction,
-  loginAction,
   LoginData,
-  logoutAction,
-  registerAction,
   type AddAddressPayload,
   type AuthNavbarState,
   type LoginPayload,
   type RegisterPayload,
   type UpdateProfilePayload,
 } from "@/services/auth";
+import {
+  getCurrentUserClient,
+  loginClient,
+  logoutClient,
+  registerClient,
+} from "@/services/auth-client";
 import type { UserProfile } from "@/types/user";
 import { AxiosError } from "axios";
 import {
@@ -229,7 +231,7 @@ export const useCurrentUser = (
 ) => {
   return useQuery<AuthNavbarState>({
     queryKey: authKeys.navbarState,
-    queryFn: getCurrentUserFromTokenAction,
+    queryFn: getCurrentUserClient,
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: false,
     ...options,
@@ -280,7 +282,7 @@ export const useLoginMutation = (
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: loginAction,
+    mutationFn: loginClient,
     onSuccess: (data, variables, onMutateResult, context) => {
       // Invalidate and refetch user queries
       queryClient.invalidateQueries({ queryKey: authKeys.navbarState });
@@ -309,7 +311,7 @@ export const useRegisterMutation = (
   options?: UseMutationOptions<ApiResponse<unknown>, Error, RegisterPayload>,
 ) => {
   return useMutation({
-    mutationFn: registerAction,
+    mutationFn: registerClient,
     onError: (error, variables, onMutateResult, context) => {
       console.error("Registration failed:", error);
       if (options?.onError) {
@@ -354,12 +356,16 @@ export const useResetPasswordMutation = (
  * Logout mutation hook
  */
 export const useLogoutMutation = (
-  options?: UseMutationOptions<{ success: boolean }, Error, void>,
+  options?: UseMutationOptions<
+    { success: boolean; message: string },
+    Error,
+    void
+  >,
 ) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: logoutAction,
+    mutationFn: logoutClient,
     onSuccess: (data, variables, onMutateResult, context) => {
       // Clear all user related queries
       queryClient.removeQueries({ queryKey: authKeys.navbarState });

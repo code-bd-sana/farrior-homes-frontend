@@ -1,5 +1,6 @@
 "use server";
 
+import { API_BASE_URL } from "@/lib/api";
 import { cookies } from "next/headers";
 
 /**
@@ -9,20 +10,7 @@ import { cookies } from "next/headers";
  * @throws If no API base URL is configured in production.
  */
 function getApiBaseUrl(): string {
-  const configured =
-    process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL;
-
-  if (configured) {
-    return configured.replace(/\/+$/, "");
-  }
-
-  if (process.env.NODE_ENV !== "production") {
-    return "http://localhost:5000/api";
-  }
-
-  throw new Error(
-    "API base URL is missing. Set `API_BASE_URL` (preferred) or `NEXT_PUBLIC_API_BASE_URL` in Vercel.",
-  );
+  return API_BASE_URL;
 }
 
 type ApiFetchOptions = RequestInit & {
