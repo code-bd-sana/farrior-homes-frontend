@@ -28,7 +28,7 @@ export default function SignupPage() {
   const registerMutation = useRegisterMutation({
     onSuccess: (data) => {
       if (data.success) {
-        toast.success('User Registered Successfully!')
+        toast.success("User Registered Successfully!");
         setTimeout(() => {
           router.push("/login");
         }, 700);
@@ -80,7 +80,7 @@ export default function SignupPage() {
   return (
     <div
       className='
-      min-h-screen w-full flex flex-col items-center justify-center relative
+      min-h-screen w-full flex flex-col items-center justify-center relative px-4 md:px-10 lg:px-0
     '>
       {/* Background image */}
       <div className='absolute inset-0 z-10'>
@@ -94,7 +94,7 @@ export default function SignupPage() {
       </div>
 
       {/* Logo */}
-      <div className='absolute top-6 left-6 flex items-center gap-2'>
+      <div className='absolute top-4 left-1/2 -translate-x-1/2 z-20 md:top-5 lg:top-6 lg:left-6 lg:translate-x-0 flex items-center gap-2'>
         <Image
           src='/logo.png'
           alt='Farrior Homes'
@@ -108,7 +108,7 @@ export default function SignupPage() {
       {/* Card */}
       <form
         onSubmit={handleSubmit}
-        className='bg-white rounded-lg w-full max-w-md mx-4 px-8 py-8 border border-[#D1CEC6] relative z-10'>
+        className='bg-white rounded-lg w-full max-w-md mx-0 md:mx-4 lg:mx-4 px-5 md:px-7 lg:px-8 py-8 mt-28 md:mt-28 lg:my-32 border border-[#D1CEC6] relative z-10'>
         {/* Full Name */}
         <div className='mb-4'>
           <label className='block text-sm font-medium text-[#1B1B1A] mb-2'>
