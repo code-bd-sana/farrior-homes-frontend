@@ -5,8 +5,8 @@ import ViewButton from "../shared/ViewButton/ViewButton";
 export default function MakeAJourney() {
   return (
     <div className='md:mx-12.5'>
-      <div className='grid grid-cols-1 md:grid-cols-12 gap-6 my-16 md:my-20 px-4 md:px-8 '>
-        <div className='md:col-span-4 bg-[#304C3E] text-white px-8 py-14 md:py-26 rounded-lg md:rounded-r-none'>
+      <div className='grid grid-cols-1 lg:grid-cols-12 gap-6 my-16 md:my-20 px-4 md:px-8'>
+        <div className='order-1 lg:col-span-4 bg-[#304C3E] text-white px-8 py-14 md:py-26 rounded-lg lg:rounded-r-none'>
           <Title
             title={"Your South Suburbs Dream Home Awaits"}
             subtitle={
@@ -25,14 +25,14 @@ export default function MakeAJourney() {
             className='bg-white! text-(--primary)! mt-8'
           />
         </div>
-        <div className='hidden md:flex md:col-span-8'>
-          <div className='relative w-full h-screen md:h-full'>
+        <div className='order-2 hidden md:block lg:col-span-8'>
+          <div className='relative w-full h-80 md:h-105 lg:h-full'>
             <Image
               src='/Hero1.jpg'
               alt='Make a Journey'
               fill
               sizes='(max-width: 768px) 100vw, 50vw'
-              className='object-cover w-full h-full rounded-lg md:rounded-l-none'
+              className='object-cover w-full h-full rounded-lg lg:rounded-l-none'
             />
           </div>
         </div>
