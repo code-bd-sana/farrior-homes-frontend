@@ -27,8 +27,9 @@ export default function SubscriptionContent() {
       priceType: "",
       description:
         "Perfect for new users, early-stage buyers, and casual visitors.",
-      buttonText: isSubscribed ? "Switch to Free" : "Free Plan",
+      buttonText: isSubscribed ? "Free Plan" : "Current Plan",
       status: !isSubscribed ? "active" : "inactive",
+      startCheckout: false,
       features: [
         "Public property browsing (Buy/Rent)",
         "Basic property search and filters",
@@ -45,12 +46,13 @@ export default function SubscriptionContent() {
     {
       plan: "Premium",
       type: "Elite/Concierge",
-      price: "$99",
-      priceType: "Life Time",
+      price: "$19.99",
+      priceType: "month",
       description:
-        "Perfect for new users, early-stage buyers, and casual visitors",
-      buttonText: isSubscribed ? "Current Plan" : "Get Started",
+        "Full premium access with recurring monthly billing and continuous feature updates.",
+      buttonText: isSubscribed ? "Current Plan" : "Subscribe Now",
       status: isSubscribed ? "active" : "inactive",
+      startCheckout: !isSubscribed,
       features: [
         "Unlimited saved properties",
         "All premium services and Messaging",
@@ -94,6 +96,7 @@ export default function SubscriptionContent() {
               <SubscriptionButton
                 status={subscription.status}
                 text={subscription.buttonText}
+                startCheckout={subscription.startCheckout}
                 disabled={isSubscribed && subscription.plan === "Premium"}
               />
             </div>

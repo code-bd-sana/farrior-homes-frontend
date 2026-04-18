@@ -14,15 +14,22 @@ function formatDate(value?: string): string {
 }
 
 function formatAmount(amount: number, currency: string): string {
+  const hasFraction = !Number.isInteger(amount);
+
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: currency.toUpperCase(),
-    maximumFractionDigits: 0,
+    minimumFractionDigits: hasFraction ? 2 : 0,
+    maximumFractionDigits: 2,
   }).format(amount);
 }
 
 function getPlanLabel(item: PaymentHistoryItem): string {
-  if (item.lifetimeAccessGranted || item.amount >= 99) {
+  if (item.billingInterval === "month") {
+    return "Premium (Monthly)";
+  }
+
+  if (item.lifetimeAccessGranted) {
     return "Premium (Lifetime)";
   }
 

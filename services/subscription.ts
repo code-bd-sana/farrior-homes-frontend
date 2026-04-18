@@ -17,12 +17,14 @@ export type PaymentHistoryItem = {
   currency: string;
   status: "PENDING" | "COMPLETED" | "FAILED";
   transactionId: string;
-  lifetimeAccessGranted: boolean;
+  lifetimeAccessGranted?: boolean;
+  billingInterval?: "month" | "year" | "week" | "day" | string;
   createdAt: string;
   updatedAt: string;
   paidAt?: string;
   stripeCheckoutSessionId?: string;
   stripePaymentIntentId?: string;
+  stripeSubscriptionId?: string;
 };
 
 export const CreateSubscription = async () => {

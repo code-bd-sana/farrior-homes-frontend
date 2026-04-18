@@ -7,12 +7,14 @@ export interface SubscriptionButtonProps {
   status: string;
   text: string;
   disabled?: boolean;
+  startCheckout?: boolean;
 }
 
 const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({
   status,
   text,
   disabled = false,
+  startCheckout = false,
 }) => {
   const { createMutation } = useSubscriptionMutations();
 
@@ -26,9 +28,8 @@ const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({
   }, [isSuccess, data]);
 
   const handleClick = () => {
-    if (text === "Get Started") {
-      createMutation.mutate();
-    }
+    if (!startCheckout || isPending || disabled) return;
+    createMutation.mutate();
   };
 
   return (
