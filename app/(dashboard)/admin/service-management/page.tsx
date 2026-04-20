@@ -16,6 +16,7 @@ import { FiTrash2, FiX } from "react-icons/fi";
 import { toast } from "sonner";
 
 const ADD_NEW_CATEGORY_VALUE = "__add_new_category__";
+const MAX_POINTS = 10;
 
 const isPredefinedCategory = (value: string): boolean =>
   PREDEFINED_SERVICE_CATEGORIES.some(
@@ -25,13 +26,9 @@ const isPredefinedCategory = (value: string): boolean =>
 const sortServicesWithinCategory = (
   services: IServiceResponse[],
 ): IServiceResponse[] => {
-  return [...services].sort((a, b) => {
-    const orderDifference = (a.order ?? 1) - (b.order ?? 1);
-    if (orderDifference !== 0) {
-      return orderDifference;
-    }
-    return (a.name ?? "").localeCompare(b.name ?? "");
-  });
+  return [...services].sort((a, b) =>
+    (a.name ?? "").localeCompare(b.name ?? ""),
+  );
 };
 
 const getServiceNameText = (service: IServiceResponse): string => {
@@ -87,12 +84,61 @@ const getDescriptionText = (value: unknown): string => {
   return "";
 };
 
-const getPriceText = (value: unknown): string => {
-  if (typeof value === "string" && value.trim().length > 0) {
-    return value.trim();
+const normalizePointValues = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => {
+        if (typeof item === "string") {
+          return item.trim();
+        }
+
+        if (
+          item &&
+          typeof item === "object" &&
+          "text" in item &&
+          typeof (item as { text?: unknown }).text === "string"
+        ) {
+          return (item as { text: string }).text.trim();
+        }
+
+        return "";
+      })
+      .filter((item) => item.length > 0);
   }
 
-  return "Price on request";
+  if (typeof value === "string" && value.trim().length > 0) {
+    return [value.trim()];
+  }
+
+  if (
+    value &&
+    typeof value === "object" &&
+    "text" in value &&
+    typeof (value as { text?: unknown }).text === "string"
+  ) {
+    return [(value as { text: string }).text.trim()].filter(
+      (item) => item.length > 0,
+    );
+  }
+
+  return [];
+};
+
+const getPointsText = (service: IServiceResponse): string[] => {
+  const pointsFromService = normalizePointValues(service.points);
+  if (pointsFromService.length > 0) {
+    return pointsFromService;
+  }
+
+  const legacy = service as IServiceResponse & { description?: unknown };
+  const pointsFromLegacyDescription = Array.isArray(legacy.description)
+    ? normalizePointValues(legacy.description)
+    : [];
+  if (pointsFromLegacyDescription.length > 0) {
+    return pointsFromLegacyDescription;
+  }
+
+  return normalizePointValues(service.price);
 };
 
 const ServiceModal = ({
@@ -140,16 +186,13 @@ const ServiceModal = ({
       ? getDescriptionText(initialService.description)
       : "",
   );
-  const [price, setPrice] = useState(
-    mode === "edit" && initialService ? (initialService.price ?? "") : "",
+  const [points, setPoints] = useState<string[]>(
+    mode === "edit" && initialService ? getPointsText(initialService) : [""],
   );
   const [isPremiumIncluded, setIsPremiumIncluded] = useState(
     mode === "edit" && initialService
       ? Boolean(initialService.isPremiumIncluded)
       : false,
-  );
-  const [orderValue, setOrderValue] = useState(
-    mode === "edit" && initialService ? String(initialService.order ?? 1) : "1",
   );
 
   const handleCategoryChange = (value: string) => {
@@ -159,6 +202,25 @@ const ServiceModal = ({
     }
   };
 
+  const updatePoint = (index: number, value: string) => {
+    setPoints((prev) =>
+      prev.map((point, currentIndex) =>
+        currentIndex === index ? value : point,
+      ),
+    );
+  };
+
+  const addPoint = () => {
+    setPoints((prev) => (prev.length >= MAX_POINTS ? prev : [...prev, ""]));
+  };
+
+  const removePoint = (index: number) => {
+    setPoints((prev) => {
+      const next = prev.filter((_, currentIndex) => currentIndex !== index);
+      return next.length > 0 ? next : [""];
+    });
+  };
+
   const handleDone = async () => {
     const cleanCategory =
       selectedCategory === ADD_NEW_CATEGORY_VALUE
@@ -166,8 +228,9 @@ const ServiceModal = ({
         : selectedCategory.trim();
     const cleanServiceName = serviceName.trim();
     const cleanDescription = fullDescription.trim();
-    const cleanPrice = price.trim();
-    const parsedOrder = Number.parseInt(orderValue, 10);
+    const cleanPoints = points
+      .map((point) => point.trim())
+      .filter((point) => point.length > 0);
 
     if (!cleanCategory) {
       toast.warning("Category is required.");
@@ -181,12 +244,8 @@ const ServiceModal = ({
       toast.warning("Full description is required.");
       return;
     }
-    if (!cleanPrice) {
-      toast.warning("Price is required.");
-      return;
-    }
-    if (!Number.isInteger(parsedOrder) || parsedOrder < 1) {
-      toast.warning("Order must be a number greater than or equal to 1.");
+    if (cleanPoints.length === 0) {
+      toast.warning("Add at least one price point.");
       return;
     }
 
@@ -194,9 +253,8 @@ const ServiceModal = ({
       category: cleanCategory,
       name: cleanServiceName,
       description: cleanDescription,
-      price: cleanPrice,
+      points: cleanPoints,
       isPremiumIncluded,
-      order: parsedOrder,
     });
 
     onClose();
@@ -293,17 +351,45 @@ const ServiceModal = ({
           </div>
 
           <div>
-            <label className='block text-sm text-gray-600 mb-2'>Price</label>
-            <input
-              type='text'
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder='Ex: $1,500 or 4% (Retail Rate...)'
-              className='w-full border border-[#D1CEC6] rounded-lg px-4 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-[#4A90B8]'
-            />
+            <div className='mb-2 flex items-center justify-between'>
+              <label className='block text-sm text-gray-600'>
+                Price Points
+              </label>
+              <button
+                type='button'
+                onClick={addPoint}
+                disabled={points.length >= MAX_POINTS}
+                className='text-sm text-[#5F8E7E] disabled:opacity-40'>
+                + Add Price Point
+              </button>
+            </div>
+
+            <div className='space-y-2'>
+              {points.map((point, index) => (
+                <div key={index} className='flex gap-2'>
+                  <input
+                    type='text'
+                    value={point}
+                    onChange={(e) => updatePoint(index, e.target.value)}
+                    placeholder={
+                      index === 0
+                        ? "2% (Retail Rate for Farrior Premium Member )"
+                        : `Price point ${index + 1}`
+                    }
+                    className='w-full border border-[#D1CEC6] rounded-lg px-4 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-[#4A90B8]'
+                  />
+                  <button
+                    type='button'
+                    onClick={() => removePoint(index)}
+                    className='px-3 rounded-lg border border-[#D1CEC6] text-gray-500 hover:bg-gray-50'>
+                    <FiX size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className='flex items-center justify-between gap-4 border border-[#D1CEC6] rounded-lg px-4 py-3'>
+          <div className='flex items-center gap-3 border border-[#D1CEC6] rounded-lg px-4 py-3'>
             <label className='flex items-center gap-3 text-sm text-gray-700'>
               <input
                 type='checkbox'
@@ -313,17 +399,6 @@ const ServiceModal = ({
               />
               Included with Farrior Premium Membership ($0)
             </label>
-
-            <div className='w-32'>
-              <label className='block text-xs text-gray-500 mb-1'>Order</label>
-              <input
-                type='number'
-                min={1}
-                value={orderValue}
-                onChange={(e) => setOrderValue(e.target.value)}
-                className='w-full border border-[#D1CEC6] rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-[#4A90B8]'
-              />
-            </div>
           </div>
         </div>
 
@@ -531,28 +606,36 @@ const Page = () => {
                     onClick={() => openEditModal(service)}
                     key={service._id || service.id}
                     className='border border-gray-300 rounded-lg p-6 flex flex-col h-full cursor-pointer hover:border-[#5F8E7E] transition-colors'>
-                    <h4 className='text-lg font-semibold text-gray-900 mb-2'>
+                    <h4 className='text-2xl font-medium text-gray-900 mb-2'>
                       {getServiceNameText(service)}
                     </h4>
-                    <p className='text-sm text-gray-600 leading-relaxed mb-4'>
+                    <p className='text-sm text-[#70706C] leading-relaxed mb-4'>
                       {getDescriptionText(service.description)}
                     </p>
 
-                    <div className='mt-auto border-t border-[#ECE9E2] pt-4'>
-                      <p className='text-xs uppercase tracking-wide text-gray-500 mb-1'>
-                        Price
-                      </p>
-                      <p className='text-xl font-semibold text-[#2F6E52]'>
-                        {getPriceText(service.price)}
-                      </p>
-                      {service.isPremiumIncluded && (
-                        <p className='text-sm text-[#3A7E5F] mt-2'>
-                          Included with Farrior Premium Membership ($0)
-                        </p>
-                      )}
-                      <p className='text-xs text-gray-500 mt-2'>
-                        Display order: {service.order}
-                      </p>
+                    <div className='mt-auto pt-4'>
+                      <ul className='space-y-2'>
+                        {getPointsText(service).map((point, index) => (
+                          <li
+                            key={`${service._id || service.id}-point-${index}`}
+                            className='flex items-start gap-2 text-sm text-[#5F5F5F]'>
+                            <span className='mt-2 h-2 w-2 rounded-full bg-[#619B7F] shrink-0' />
+                            <span>{point}</span>
+                          </li>
+                        ))}
+
+                        {service.isPremiumIncluded &&
+                          !getPointsText(service).some((point) =>
+                            /premium|\$0/i.test(point),
+                          ) && (
+                            <li className='flex items-start gap-2 text-sm text-[#5F5F5F]'>
+                              <span className='mt-2 h-2 w-2 rounded-full bg-[#619B7F] shrink-0' />
+                              <span>
+                                Included with Farrior Premium Membership ($0)
+                              </span>
+                            </li>
+                          )}
+                      </ul>
                     </div>
                   </div>
                 ))}

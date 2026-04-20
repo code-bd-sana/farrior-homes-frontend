@@ -3,24 +3,27 @@ import { AxiosError } from "axios";
 
 export const PREDEFINED_SERVICE_CATEGORIES = [
   "Full Service",
+  "Investor & Unrepresented Seller Services",
   "Consultations",
   "Rental Services",
-  "BPO Services",
-  "Market Analysis",
+  "Residential BPO Services",
+  "Commercial BPO Services",
+  "Comparative Market Analysis",
 ] as const;
 
 export interface ICreateService {
   category: string;
   name: string;
   description: string;
-  price: string;
+  points: string[];
   isPremiumIncluded: boolean;
-  order: number;
 }
 
 export interface IServiceResponse extends ICreateService {
   _id?: string;
   id?: string;
+  // Legacy fields kept optional so old records can still be rendered safely.
+  price?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -115,14 +118,14 @@ const normalizeServicePayload = (
   if (typeof data.description === "string") {
     payload.description = data.description.trim();
   }
-  if (typeof data.price === "string") {
-    payload.price = data.price.trim();
+  if (Array.isArray(data.points)) {
+    payload.points = data.points
+      .filter((item): item is string => typeof item === "string")
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0);
   }
   if (typeof data.isPremiumIncluded === "boolean") {
     payload.isPremiumIncluded = data.isPremiumIncluded;
-  }
-  if (typeof data.order === "number") {
-    payload.order = data.order;
   }
 
   return payload;
@@ -133,6 +136,19 @@ const normalizeDescriptionValue = (value: unknown): string => {
     return value.trim();
   }
 
+  if (
+    value &&
+    typeof value === "object" &&
+    "text" in value &&
+    typeof (value as { text?: unknown }).text === "string"
+  ) {
+    return (value as { text: string }).text.trim();
+  }
+
+  return "";
+};
+
+const normalizePointsValue = (value: unknown): string[] => {
   if (Array.isArray(value)) {
     return value
       .map((item) => {
@@ -151,8 +167,11 @@ const normalizeDescriptionValue = (value: unknown): string => {
 
         return "";
       })
-      .filter((item) => item.length > 0)
-      .join(" ");
+      .filter((item) => item.length > 0);
+  }
+
+  if (typeof value === "string" && value.trim().length > 0) {
+    return [value.trim()];
   }
 
   if (
@@ -161,10 +180,12 @@ const normalizeDescriptionValue = (value: unknown): string => {
     "text" in value &&
     typeof (value as { text?: unknown }).text === "string"
   ) {
-    return (value as { text: string }).text.trim();
+    return [(value as { text: string }).text.trim()].filter(
+      (item) => item.length > 0,
+    );
   }
 
-  return "";
+  return [];
 };
 
 const normalizeServiceResponse = (service: unknown): IServiceResponse => {
@@ -185,15 +206,28 @@ const normalizeServiceResponse = (service: unknown): IServiceResponse => {
   const descriptionFromLegacy =
     typeof raw.subTitle === "string" ? raw.subTitle.trim() : "";
 
+  const pointsFromRaw = normalizePointsValue(raw.points);
+  const pointsFromLegacyDescription = Array.isArray(raw.description)
+    ? normalizePointsValue(raw.description)
+    : [];
+  const pointsFromPrice = normalizePointsValue(raw.price);
+
+  const points =
+    pointsFromRaw.length > 0
+      ? pointsFromRaw
+      : pointsFromLegacyDescription.length > 0
+        ? pointsFromLegacyDescription
+        : pointsFromPrice;
+
   const description =
-    normalizeDescriptionValue(raw.description) || descriptionFromLegacy;
+    (typeof raw.description === "string"
+      ? normalizeDescriptionValue(raw.description)
+      : "") || descriptionFromLegacy;
 
-  const price = typeof raw.price === "string" ? raw.price.trim() : "";
-
-  const order =
-    typeof raw.order === "number" && Number.isFinite(raw.order) && raw.order > 0
-      ? Math.trunc(raw.order)
-      : 1;
+  const legacyPrice =
+    typeof raw.price === "string" && raw.price.trim().length > 0
+      ? raw.price.trim()
+      : undefined;
 
   return {
     _id: typeof raw._id === "string" ? raw._id : undefined,
@@ -201,12 +235,12 @@ const normalizeServiceResponse = (service: unknown): IServiceResponse => {
     category,
     name,
     description,
-    price,
+    points,
     isPremiumIncluded:
       typeof raw.isPremiumIncluded === "boolean"
         ? raw.isPremiumIncluded
         : false,
-    order,
+    price: legacyPrice,
     createdAt: typeof raw.createdAt === "string" ? raw.createdAt : "",
     updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : "",
   };
@@ -230,8 +264,8 @@ export async function createService(
       "/service/create",
       {
         ...payload,
+        points: payload.points ?? [],
         isPremiumIncluded: payload.isPremiumIncluded ?? false,
-        order: payload.order ?? 1,
       },
     );
     return normalizeServiceResponse(response.data.data);
