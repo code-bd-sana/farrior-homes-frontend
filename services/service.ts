@@ -1,34 +1,29 @@
 import axiosClient from "@/lib/axiosClient";
 import { AxiosError } from "axios";
 
-// API request and response types for Service entity
+export const PREDEFINED_SERVICE_CATEGORIES = [
+  "Full Service",
+  "Investor & Unrepresented Seller Services",
+  "Consultations",
+  "Rental Services",
+  "Residential BPO Services",
+  "Commercial BPO Services",
+  "Comparative Market Analysis",
+] as const;
 
 export interface ICreateService {
-  title: string;
-  subTitle: string;
-  moreSubTitle?: string;
-  description: Array<{
-    id?: string;
-    text: string;
-  }>;
+  category: string;
+  name: string;
+  description: string;
+  points: string[];
+  isPremiumIncluded: boolean;
 }
 
-// API response type for a single service
-
-export interface IServiceDescriptionItem {
-  id?: string;
-  text: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export interface IServiceResponse {
+export interface IServiceResponse extends ICreateService {
   _id?: string;
   id?: string;
-  title: string;
-  subTitle: string;
-  moreSubTitle?: string;
-  description: IServiceDescriptionItem[];
+  // Legacy fields kept optional so old records can still be rendered safely.
+  price?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -107,45 +102,148 @@ const parseValidationErrors = (errors: unknown): string => {
   return formatErrorMessage(errors);
 };
 
-type DescriptionInput =
-  | string
-  | IServiceDescriptionItem
-  | ICreateService["description"][number];
+type ServicePayloadInput = Partial<ICreateService | IServiceResponse>;
 
-type ServiceFormInput = {
-  title?: string;
-  subTitle?: string;
-  moreSubTitle?: string;
-  description?: DescriptionInput[];
+const normalizeServicePayload = (
+  data: ServicePayloadInput,
+): Partial<ICreateService> => {
+  const payload: Partial<ICreateService> = {};
+
+  if (typeof data.category === "string") {
+    payload.category = data.category.trim();
+  }
+  if (typeof data.name === "string") {
+    payload.name = data.name.trim();
+  }
+  if (typeof data.description === "string") {
+    payload.description = data.description.trim();
+  }
+  if (Array.isArray(data.points)) {
+    payload.points = data.points
+      .filter((item): item is string => typeof item === "string")
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0);
+  }
+  if (typeof data.isPremiumIncluded === "boolean") {
+    payload.isPremiumIncluded = data.isPremiumIncluded;
+  }
+
+  return payload;
 };
 
-export const toFormData = (data: ServiceFormInput): FormData => {
-  const formData = new FormData();
-
-  if (typeof data.title === "string") {
-    formData.append("title", data.title);
-  }
-  if (typeof data.subTitle === "string") {
-    formData.append("subTitle", data.subTitle);
-  }
-  if (typeof data.moreSubTitle === "string") {
-    formData.append("moreSubTitle", data.moreSubTitle);
+const normalizeDescriptionValue = (value: unknown): string => {
+  if (typeof value === "string") {
+    return value.trim();
   }
 
-  if (Array.isArray(data.description)) {
-    data.description.forEach((desc, index) => {
-      const text = typeof desc === "string" ? desc : desc?.text;
-      if (typeof text === "string" && text.trim().length > 0) {
-        formData.append(`description[${index}][text]`, text.trim());
+  if (
+    value &&
+    typeof value === "object" &&
+    "text" in value &&
+    typeof (value as { text?: unknown }).text === "string"
+  ) {
+    return (value as { text: string }).text.trim();
+  }
 
-        if (typeof desc === "object" && desc?.id) {
-          formData.append(`description[${index}][id]`, desc.id);
+  return "";
+};
+
+const normalizePointsValue = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => {
+        if (typeof item === "string") {
+          return item.trim();
         }
-      }
-    });
+
+        if (
+          item &&
+          typeof item === "object" &&
+          "text" in item &&
+          typeof (item as { text?: unknown }).text === "string"
+        ) {
+          return (item as { text: string }).text.trim();
+        }
+
+        return "";
+      })
+      .filter((item) => item.length > 0);
   }
 
-  return formData;
+  if (typeof value === "string" && value.trim().length > 0) {
+    return [value.trim()];
+  }
+
+  if (
+    value &&
+    typeof value === "object" &&
+    "text" in value &&
+    typeof (value as { text?: unknown }).text === "string"
+  ) {
+    return [(value as { text: string }).text.trim()].filter(
+      (item) => item.length > 0,
+    );
+  }
+
+  return [];
+};
+
+const normalizeServiceResponse = (service: unknown): IServiceResponse => {
+  const raw = (service ?? {}) as Record<string, unknown>;
+
+  const category =
+    typeof raw.category === "string" && raw.category.trim().length > 0
+      ? raw.category.trim()
+      : PREDEFINED_SERVICE_CATEGORIES[0];
+
+  const name =
+    typeof raw.name === "string" && raw.name.trim().length > 0
+      ? raw.name.trim()
+      : typeof raw.title === "string" && raw.title.trim().length > 0
+        ? raw.title.trim()
+        : "Untitled Service";
+
+  const descriptionFromLegacy =
+    typeof raw.subTitle === "string" ? raw.subTitle.trim() : "";
+
+  const pointsFromRaw = normalizePointsValue(raw.points);
+  const pointsFromLegacyDescription = Array.isArray(raw.description)
+    ? normalizePointsValue(raw.description)
+    : [];
+  const pointsFromPrice = normalizePointsValue(raw.price);
+
+  const points =
+    pointsFromRaw.length > 0
+      ? pointsFromRaw
+      : pointsFromLegacyDescription.length > 0
+        ? pointsFromLegacyDescription
+        : pointsFromPrice;
+
+  const description =
+    (typeof raw.description === "string"
+      ? normalizeDescriptionValue(raw.description)
+      : "") || descriptionFromLegacy;
+
+  const legacyPrice =
+    typeof raw.price === "string" && raw.price.trim().length > 0
+      ? raw.price.trim()
+      : undefined;
+
+  return {
+    _id: typeof raw._id === "string" ? raw._id : undefined,
+    id: typeof raw.id === "string" ? raw.id : undefined,
+    category,
+    name,
+    description,
+    points,
+    isPremiumIncluded:
+      typeof raw.isPremiumIncluded === "boolean"
+        ? raw.isPremiumIncluded
+        : false,
+    price: legacyPrice,
+    createdAt: typeof raw.createdAt === "string" ? raw.createdAt : "",
+    updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : "",
+  };
 };
 
 /**
@@ -160,11 +258,17 @@ export async function createService(
   serviceData: ICreateService,
 ): Promise<IServiceResponse> {
   try {
+    const payload = normalizeServicePayload(serviceData) as ICreateService;
+
     const response = await axiosClient.post<ApiResponse<IServiceResponse>>(
       "/service/create",
-      serviceData,
+      {
+        ...payload,
+        points: payload.points ?? [],
+        isPremiumIncluded: payload.isPremiumIncluded ?? false,
+      },
     );
-    return response.data.data;
+    return normalizeServiceResponse(response.data.data);
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
     const errorData = axiosError.response?.data as ApiErrorResponse | undefined;
@@ -225,7 +329,7 @@ export async function getServiceById(id: string): Promise<IServiceResponse> {
     const response = await axiosClient.get<ApiResponse<IServiceResponse>>(
       `/service/${id}`,
     );
-    return response.data.data;
+    return normalizeServiceResponse(response.data.data);
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
     const errorData = axiosError.response?.data as ApiErrorResponse | undefined;
@@ -249,14 +353,28 @@ export async function getServiceById(id: string): Promise<IServiceResponse> {
 
 export async function getAllServices(): Promise<PaginatedServicesResponse> {
   try {
-    const response =
-      await axiosClient.get<
-        ApiResponse<{
-          services: IServiceResponse[];
-          pagination: ServicePagination;
-        }>
-      >("/service/many");
-    return response.data.data;
+    const response = await axiosClient.get<
+      ApiResponse<{
+        services: IServiceResponse[];
+        pagination: ServicePagination;
+      }>
+    >("/service/many", {
+      params: {
+        page: 1,
+        limit: 100,
+      },
+    });
+
+    const normalizedServices = Array.isArray(response.data.data?.services)
+      ? response.data.data.services.map((service) =>
+          normalizeServiceResponse(service),
+        )
+      : [];
+
+    return {
+      ...response.data.data,
+      services: normalizedServices,
+    };
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
     const errorData = axiosError.response?.data as ApiErrorResponse | undefined;
@@ -281,24 +399,17 @@ export async function getAllServices(): Promise<PaginatedServicesResponse> {
  */
 export async function updateServiceById(
   id: string,
-  serviceData: Partial<ICreateService | IServiceResponse>,
+  serviceData: Partial<ICreateService>,
 ): Promise<IServiceResponse> {
   try {
-    const payload = {
-      title: serviceData.title,
-      subTitle: serviceData.subTitle,
-      moreSubTitle: serviceData.moreSubTitle,
-      description: Array.isArray(serviceData.description)
-        ? (serviceData.description as DescriptionInput[])
-        : undefined,
-    };
+    const payload = normalizeServicePayload(serviceData);
 
     const response = await axiosClient.patch<ApiResponse<IServiceResponse>>(
       `/service/${id}`,
       payload,
     );
 
-    return response.data.data;
+    return normalizeServiceResponse(response.data.data);
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
     const errorData = axiosError.response?.data as ApiErrorResponse | undefined;
