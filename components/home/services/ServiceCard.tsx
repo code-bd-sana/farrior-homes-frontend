@@ -164,7 +164,7 @@ const ServiceInfoCard = ({ service }: { service: IServiceResponse }) => {
     !points.some((point) => /premium|\$0/i.test(point));
 
   return (
-    <article className='flex h-full min-h-60 flex-col rounded-xl border border-[#D4D0C9] bg-white p-6'>
+    <article className='flex h-full max-h-70 min-h-70 flex-col rounded-xl border border-[#D4D0C9] bg-white p-6'>
       <h3 className='text-[30px] leading-[1.08] text-[#222222] min-h-15'>
         {getServiceNameText(service)}
       </h3>
@@ -234,7 +234,7 @@ export default function ServiceCard() {
   }
 
   return (
-    <div className='space-y-8'>
+    <div className='space-y-8 '>
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
         <h2 className='text-4xl md:text-5xl leading-none text-[#222222]'>
           Services
@@ -256,7 +256,7 @@ export default function ServiceCard() {
       </div>
 
       {filteredServices.length ? (
-        <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6'>
+        <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 items-start gap-6'>
           {filteredServices.map((service) => (
             <ServiceInfoCard
               key={service._id || service.id}
