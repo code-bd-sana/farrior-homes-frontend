@@ -158,7 +158,7 @@ export default function SignupPage() {
             <FiPhone className='w-4 h-4 text-[#2C2C2A] shrink-0' />
             <input
               type='tel'
-              placeholder='+880 1*** ******'
+              placeholder='Enter your phone number'
               value={phone}
               onChange={(event) => setPhone(event.target.value)}
               required
