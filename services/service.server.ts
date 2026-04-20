@@ -21,10 +21,14 @@ async function getAxiosInstance() {
 export async function getAllServices(): Promise<PaginatedServicesResponse> {
   try {
     const axiosInstance = await getAxiosInstance();
-    const response =
-      await axiosInstance.get<ApiResponse<PaginatedServicesResponse>>(
-        "/service/many",
-      );
+    const response = await axiosInstance.get<
+      ApiResponse<PaginatedServicesResponse>
+    >("/service/many", {
+      params: {
+        page: 1,
+        limit: 100,
+      },
+    });
     return response.data.data;
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
